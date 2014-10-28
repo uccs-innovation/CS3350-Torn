@@ -1,0 +1,3 @@
+c:\users\cristiano\documents\visual studio 2013\Projects\Torn\Torn\TornContent\obj\x86\Debug\TornContent.contentprojResolveAssemblyReference.cache
+C:\Users\Cristiano\Projects\Torn\Torn\TornContent\obj\x86\Debug\TornContent.contentprojResolveAssemblyReference.cache
+C:\Users\Cristiano\Projects\CS3350-Torn\Torn\Torn\TornContent\obj\x86\Debug\TornContent.contentprojResolveAssemblyReference.cache
