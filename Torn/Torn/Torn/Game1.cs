@@ -32,10 +32,12 @@ namespace Torn
         List<Sprite> brokenBridges;
         int[] finished;
         Sprite levelEnd, aux;
-        Sprite textBox;
-        SpriteFont text;
-        List<Sprite> hiddenBellow, hiddenAbove, hiddenRight, hiddenLeft;
-        List<Vector2> indexesBellow, indexesAbove, indexesRight, indexesLeft;
+        List<Vector2> indexesBellow, indexesRight, indexesLeft, indexesAbove;
+        List<Sprite> hiddenAbove, hiddenBellow, hiddenRight, hiddenLeft;
+        SoundEffect ambientSound;
+        SoundEffectInstance instance;
+        Text text;
+        String tutorial;
 
         public Game1()
         {
@@ -62,7 +64,8 @@ namespace Torn
             MyGlobals.bridges = 9;
             MyGlobals.outOfSize = 10;
             MyGlobals.numberOfBlocks = 14;
-            
+
+            tutorial = "Welcome to Torn. Currently, your body is separated into three \npieces. To begin playing, move your head right \npressing H and then the right arrow.";
 
             graphics.PreferredBackBufferWidth = MyGlobals.width;
             graphics.PreferredBackBufferHeight = MyGlobals.heigh;
@@ -77,16 +80,24 @@ namespace Torn
             platesPosition = new List<Vector2>();
             brokenBridges = new List<Sprite>();
             blockSight = new List<Vector2>();
-            hiddenBellow = new List<Sprite>();
-            hiddenAbove = new List<Sprite>();
-            hiddenLeft = new List<Sprite>();
-            hiddenRight = new List<Sprite>();
-            indexesBellow = new List<Vector2>();
+
             indexesAbove = new List<Vector2>();
+            indexesBellow = new List<Vector2>();
             indexesLeft = new List<Vector2>();
             indexesRight = new List<Vector2>();
+
+            hiddenAbove = new List<Sprite>();
+            hiddenBellow = new List<Sprite>();
+            hiddenLeft = new List<Sprite>();
+            hiddenRight = new List<Sprite>();
+
             finished = new int[3] { 0, 0, 0 };
             readField();
+
+            ambientSound = Content.Load<SoundEffect>(@"Sounds\music");
+            instance = ambientSound.CreateInstance();
+            instance.IsLooped = true;
+            ambientSound.Play();
 
         }
         
@@ -100,7 +111,7 @@ namespace Torn
         public void readField()
         {
             string line;
-            int i = 0, j = 0, lastJ = 0, lastI = 0, result, rest;
+            int i = 0, j = 0, lastJ = 0, lastI = 0, result = 0, rest = 0;
 
             System.IO.StreamReader file = new System.IO.StreamReader(@"Levels\tutorial.txt");
             while ((line = file.ReadLine()) != null)
@@ -144,6 +155,7 @@ namespace Torn
                     }
                 }
             }
+            MyGlobals.realHeigh = MyGlobals.blockSize * (lastJ - 1) + MyGlobals.blockSize * result;
 
             if (lastI < MyGlobals.numberOfBlocks)
             {
@@ -172,6 +184,8 @@ namespace Torn
                     }
                 }
             }
+
+            MyGlobals.realWidth = MyGlobals.blockSize * (lastI - 1) + MyGlobals.blockSize * result;
             file.Close();
 
             using (TextWriter tw = new StreamWriter(@"Levels\levelTeste.txt"))
@@ -190,9 +204,12 @@ namespace Torn
         protected override void LoadContent()
         {
             //Displays the initial screen
+            
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+
             if (!started)
             {
-                spriteBatch = new SpriteBatch(GraphicsDevice);
+                
                 initialPosition.X = graphics.PreferredBackBufferWidth / 2;
                 initialPosition.Y = graphics.PreferredBackBufferHeight / 2;
                 initialScreen = new Sprite(this, @"Images\InitialScreen", initialPosition);
@@ -232,22 +249,6 @@ namespace Torn
                             aux = new Sprite(this, @"Images\edge", initialPosition);
                             Components.Add(aux);
                             trench.Add(aux);
-                        }
-                    }
-                }
-
-                for (int i = 0; i < MyGlobals.numberOfBlocks; i++)
-                {
-                    for (int j = 0; j < MyGlobals.numberOfBlocks; j++)
-                    {
-                        if (field[i, j] == MyGlobals.blocksVision)
-                        {
-                            initialPosition.X = (j + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
-                            initialPosition.Y = (i + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
-                            aux = new Sprite(this, @"Images\BlockVision", initialPosition);
-                            trench.Add(aux);
-                            blockSight.Add(aux.Position);
-                            Components.Add(aux);
                         }
                     }
                 }
@@ -356,6 +357,22 @@ namespace Torn
                     }
                 }
 
+                for (int i = 0; i < MyGlobals.numberOfBlocks; i++)
+                {
+                    for (int j = 0; j < MyGlobals.numberOfBlocks; j++)
+                    {
+                        if (field[i, j] == MyGlobals.blocksVision)
+                        {
+                            initialPosition.X = (j + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
+                            initialPosition.Y = (i + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
+                            aux = new Sprite(this, @"Images\BlockVision", initialPosition);
+                            blockSight.Add(aux.Position);
+                            trench.Add(aux);
+                            Components.Add(aux);
+                        }
+                    }
+                }
+
                 //Initializes the blind sprinte with the same position of the head
                blindness = new Sprite(this, @"Images\Blindness", new Vector2(body[0].Position.X, body[0].Position.Y));
 
@@ -376,9 +393,12 @@ namespace Torn
                 body[1].Obstacles = obstacles;
 
                 Components.Add(blindness);
-                
+
+                text = new Text(this, new Vector2(100f, 100f), @"Verdana", tutorial, Color.White);
+                Components.Add(text);
+
             }
-            
+
         }
 
 
@@ -391,8 +411,10 @@ namespace Torn
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();           
+                this.Exit();
+
             
+
             keyboard = Keyboard.GetState();
 
             if(started)
@@ -401,125 +423,27 @@ namespace Torn
                 body[2].Obstacles = body[1].Obstacles;
             }
 
-            if (started && !isBodyMoving())
+            if(started)
             {
-                for (int i = 0; i < indexesRight.Count; i++)
+                if (body[0].Position == new Vector2(3 * MyGlobals.blockSize - MyGlobals.blockSize / 2, 8 * MyGlobals.blockSize - MyGlobals.blockSize / 2))
                 {
-                    indexesRight.RemoveAt(i);
+                    text.TextContent = "Welcome to Torn. Currently, your body is separated into three \npieces. To begin playing, move your head right \npressing H and then the right arrow.";
                 }
-                for (int i = 0; i < indexesLeft.Count; i++)
+                else if (body[0].Position == new Vector2(4 * MyGlobals.blockSize - MyGlobals.blockSize / 2, 8 * MyGlobals.blockSize - MyGlobals.blockSize / 2))
                 {
-                    indexesLeft.RemoveAt(i);
+                    text.TextContent = "Now you can see and control your body pieces. Switch through \nyour parts using H, A, L buttons.";
                 }
-                for (int i = 0; i < indexesAbove.Count; i++)
+                //else if (body[1].change && body[1].Position == new Vector2(4 * MyGlobals.blockSize - MyGlobals.blockSize / 2, 10 * MyGlobals.blockSize - MyGlobals.blockSize / 2))
+                //{
+                //    text.TextContent = "The arms are able to push blocks. Press the left arrow to push the \nblock into the trench and create a path";
+                //}
+                else if (body[1].Position == new Vector2(4 * MyGlobals.blockSize - MyGlobals.blockSize / 2, 10 * MyGlobals.blockSize - MyGlobals.blockSize / 2))
                 {
-                    indexesAbove.RemoveAt(i);
+                    text.TextContent = "Now you can pass through the bridge.";
                 }
-                for (int i = 0; i < indexesBellow.Count; i++)
+                else
                 {
-                    indexesBellow.RemoveAt(i);
-                }
-
-                //RIght
-                if (visionBlocked(blockSight, 'r'))
-                {
-                    for (int i = 0; i < indexesRight.Count; i++)
-                    {
-                        initialPosition = indexesRight[i];
-                        int aux1 = (int)((MyGlobals.width - initialPosition.X) / MyGlobals.blockSize);
-                        for (int j = 0; j < aux1; j++)
-                        {
-                            initialPosition.X += MyGlobals.blockSize;
-                            aux = new Sprite(this, @"Images\BlockVision", initialPosition);
-                            hiddenRight.Add(aux);
-                            Components.Add(aux);
-                        }
-                    }
-
-                }
-                else if (hiddenRight.Count > 0)
-                {
-                    for (int i = 0; i < hiddenRight.Count; i++)
-                    {
-                        Components.Remove(hiddenRight[i]);
-                        hiddenRight.RemoveAt(i);
-                    }
-                }
-
-                //LEFT
-                if (visionBlocked(blockSight, 'l'))
-                {
-                    for (int i = 0; i < indexesLeft.Count; i++)
-                    {
-                        initialPosition = indexesLeft[i];
-                        int aux1 = (int)((initialPosition.X) / MyGlobals.blockSize);
-                        for (int j = 0; j < aux1; j++)
-                        {
-                            initialPosition.X -= MyGlobals.blockSize;
-                            aux = new Sprite(this, @"Images\BlockVision", initialPosition);
-                            hiddenLeft.Add(aux);
-                            Components.Add(aux);
-                        }
-                    }
-
-                }
-                else if (hiddenLeft.Count > 0)
-                {
-                    for (int i = 0; i < hiddenLeft.Count; i++)
-                    {
-                        Components.Remove(hiddenLeft[i]);
-                        hiddenLeft.RemoveAt(i);
-                    }
-                }
-                //UP
-                if (visionBlocked(blockSight, 'u'))
-                {
-                    for (int i = 0; i < indexesAbove.Count; i++)
-                    {
-                        initialPosition = indexesAbove[i];
-                        int aux1 = (int)((initialPosition.Y) / MyGlobals.blockSize);
-                        for (int j = 0; j < aux1; j++)
-                        {
-                            initialPosition.Y -= MyGlobals.blockSize;
-                            aux = new Sprite(this, @"Images\BlockVision", initialPosition);
-                            hiddenAbove.Add(aux);
-                            Components.Add(aux);
-                        }
-                    }
-
-                }
-                else if (hiddenAbove.Count > 0)
-                {
-                    for (int i = 0; i < hiddenAbove.Count; i++)
-                    {
-                        Components.Remove(hiddenAbove[i]);
-                        hiddenAbove.RemoveAt(i);
-                    }
-                }
-                //down
-                if (visionBlocked(blockSight, 'd'))
-                {
-                    for (int i = 0; i < indexesBellow.Count; i++)
-                    {
-                        initialPosition = indexesBellow[i];
-                        int aux1 = (int)((MyGlobals.heigh - initialPosition.Y) / MyGlobals.blockSize);
-                        for (int j = 0; j < aux1; j++)
-                        {
-                            initialPosition.Y += MyGlobals.blockSize;
-                            aux = new Sprite(this, @"Images\BlockVision", initialPosition);
-                            hiddenBellow.Add(aux);
-                            Components.Add(aux);
-                        }
-                    }
-
-                }
-                else if (hiddenBellow.Count > 0)
-                {
-                    for (int i = 0; i < hiddenBellow.Count; i++)
-                    {
-                        Components.Remove(hiddenBellow[i]);
-                        hiddenBellow.RemoveAt(i);
-                    }
+                    text.TextContent = " ";
                 }
 
 
@@ -659,6 +583,138 @@ namespace Torn
                     body[2].Position = new Vector2(body[2].Position.X, MyGlobals.blockSize + MyGlobals.blockSize / 2);
             }
 
+            //if (started)
+            //{
+            //    int count;
+            //    indexesBellow = body[0].hidden(blockSight, 'd');
+            //    indexesRight = body[0].hidden(blockSight, 'r');
+            //    indexesLeft = body[0].hidden(blockSight, 'l');
+            //    indexesAbove = body[0].hidden(blockSight, 'u');
+
+            //    //Bellow
+            //    if (indexesBellow.Count > 0)
+            //    {
+            //        bool exist = false;
+            //        for (int i = 0; i < indexesBellow.Count; i++)
+            //        {
+            //            initialPosition = indexesBellow[i];
+            //            count = (int) ((MyGlobals.realHeigh - initialPosition.Y) / MyGlobals.blockSize);
+            //            for (int j = 0; j < count; j++)
+            //            {
+            //                initialPosition.Y += MyGlobals.blockSize;
+            //                aux = new Sprite(this, @"Images\BlockVision", initialPosition);
+            //                for (int k = 0; k < hiddenBellow.Count; k++)
+            //                {
+            //                    if (hiddenBellow[k].Position == aux.Position)
+            //                    {
+            //                        exist = true;
+            //                    }
+            //                }
+            //                if(!exist)
+            //                {
+            //                    hiddenBellow.Add(aux);
+            //                    Components.Add(aux);
+            //                }
+                            
+            //            }
+            //        }
+            //    }
+            //    else if(indexesBellow.Count == 0 && hiddenBellow.Count > 0)
+            //    {
+            //        count = hiddenBellow.Count;
+            //        for (int i = 0; i < count; i++)
+            //        {
+            //            Components.Remove(hiddenBellow[i]);
+            //        }
+            //        for (int i = count-1; i >= 0; i--)
+            //        {
+            //            hiddenBellow.RemoveAt(i);
+            //        }
+            //    }
+
+            //    //Above
+            //    if (indexesAbove.Count > 0)
+            //    {
+            //        bool exist = false;
+            //        for (int i = 0; i < indexesAbove.Count; i++)
+            //        {
+            //            initialPosition = indexesAbove[i];
+            //            count = (int)(initialPosition.Y - MyGlobals.zeroY / MyGlobals.blockSize);
+            //            for (int j = 0; j < count; j++)
+            //            {
+            //                initialPosition.Y -= MyGlobals.blockSize;
+            //                aux = new Sprite(this, @"Images\BlockVision", initialPosition);
+            //                for (int k = 0; k < hiddenAbove.Count; k++)
+            //                {
+            //                    if (hiddenAbove[k].Position == aux.Position)
+            //                    {
+            //                        exist = true;
+            //                    }
+            //                }
+            //                if (!exist)
+            //                {
+            //                    hiddenAbove.Add(aux);
+            //                    Components.Add(aux);
+            //                }
+
+            //            }
+            //        }
+            //    }
+            //    else if (indexesAbove.Count == 0 && hiddenAbove.Count > 0)
+            //    {
+            //        count = hiddenAbove.Count;
+            //        for (int i = 0; i < count; i++)
+            //        {
+            //            Components.Remove(hiddenAbove[i]);
+            //        }
+            //        for (int i = count - 1; i >= 0; i--)
+            //        {
+            //            hiddenAbove.RemoveAt(i);
+            //        }
+            //    }
+
+            //    //Left
+            //    if (indexesLeft.Count > 0)
+            //    {
+            //        bool exist = false;
+            //        for (int i = 0; i < indexesLeft.Count; i++)
+            //        {
+            //            initialPosition = indexesLeft[i];
+            //            count = (int)(initialPosition.X - MyGlobals.zeroX/ MyGlobals.blockSize);
+            //            for (int j = 0; j < count; j++)
+            //            {
+            //                initialPosition.X -= MyGlobals.blockSize;
+            //                aux = new Sprite(this, @"Images\BlockVision", initialPosition);
+            //                for (int k = 0; k < hiddenLeft.Count; k++)
+            //                {
+            //                    if (hiddenLeft[k].Position == aux.Position)
+            //                    {
+            //                        exist = true;
+            //                    }
+            //                }
+            //                if (!exist)
+            //                {
+            //                    hiddenLeft.Add(aux);
+            //                    Components.Add(aux);
+            //                }
+
+            //            }
+            //        }
+            //    }
+            //    else if (indexesLeft.Count == 0 && hiddenLeft.Count > 0)
+            //    {
+            //        count = hiddenLeft.Count;
+            //        for (int i = 0; i < count; i++)
+            //        {
+            //            Components.Remove(hiddenLeft[i]);
+            //        }
+            //        for (int i = count - 1; i >= 0; i--)
+            //        {
+            //            hiddenLeft.RemoveAt(i);
+            //        }
+            //    }
+            //}
+
             if (started)
             {
                 //Give to blindness sprite, the same position of the head
@@ -710,6 +766,7 @@ namespace Torn
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.White);
+            
             base.Draw(gameTime);
             
         }
@@ -742,74 +799,5 @@ namespace Torn
             }
             return true;
         }
-        //Fazer o esquema da visao
-        public bool visionBlocked(List<Vector2> positions, char direction)
-        {
-
-            int i;
-
-            switch (direction)
-            {
-                case 'u':
-                    for (i = 0; i < positions.Count; i++)
-                    {
-                        if (body[0].Position.Y > positions[i].Y)
-                        {
-                            indexesAbove.Add(positions[i]);
-                        }
-                    }
-                    if (indexesAbove.Count > 0)
-                    {
-                        body[0].Stoped = false;
-                        return true;
-                    }
-                    break;
-                case 'd':
-                    for (i = 0; i < positions.Count; i++)
-                    {
-                        if (body[0].Position.Y < positions[i].Y)
-                        {
-                            indexesBellow.Add(positions[i]);
-                        }
-                    }
-                    if (indexesBellow.Count > 0)
-                    {
-                        body[0].Stoped = false;
-                        return true;
-                    }
-                    break;
-                case 'r':
-                    for (i = 0; i < positions.Count; i++)
-                    {
-                        if (body[0].Position.X < positions[i].X)
-                        {
-                            indexesRight.Add(positions[i]);
-                        }
-                    }
-                    if (indexesRight.Count > 0)
-                    {
-                        body[0].Stoped = false;
-                        return true;
-                    }
-                    break;
-                case 'l':
-                    for (i = 0; i < positions.Count; i++)
-                    {
-                        if (body[0].Position.X > positions[i].X)
-                        {
-                            indexesLeft.Add(positions[i]);
-                        }
-                    }
-                    if (indexesLeft.Count > 0)
-                    {
-                        body[0].Stoped = false;
-                        return true;
-                    }
-                    break;
-            }
-
-            return false;
-        }
-
     }
 }

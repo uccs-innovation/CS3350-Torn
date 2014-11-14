@@ -28,3 +28,4 @@ Content\Images\textBox4.xnb
 Content\Images\textBox5.xnb
 Content\Images\textBox6.xnb
 Content\Images\textBox7.xnb
+Content\Sounds\music.xnb

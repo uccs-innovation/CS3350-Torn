@@ -71,7 +71,6 @@ namespace Torn
             SpriteBatch sb = ((Game1)this.Game).spriteBatch;
 
             sb.Begin();
-            //Escala aqui.
             sb.Draw(texture, position, null, color, 0f, center, MyGlobals.scale, SpriteEffects.None, 0f);
             sb.End();
             

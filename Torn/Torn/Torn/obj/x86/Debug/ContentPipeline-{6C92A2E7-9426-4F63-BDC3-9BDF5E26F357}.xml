@@ -80,7 +80,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Projects\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\Block.xnb</Output>
-      <Time>2014-10-29T16:21:57.2918883-06:00</Time>
+      <Time>2014-11-12T12:06:42-07:00</Time>
     </Item>
     <Item>
       <Source>Images\final.png</Source>
@@ -125,7 +125,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Projects\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\filledpit.xnb</Output>
-      <Time>2014-10-29T16:22:26.4144087-06:00</Time>
+      <Time>2014-11-12T12:11:00-07:00</Time>
     </Item>
     <Item>
       <Source>Images\grass.png</Source>
@@ -152,7 +152,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Projects\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\pit.xnb</Output>
-      <Time>2014-10-29T23:50:18.4366276-06:00</Time>
+      <Time>2014-11-12T12:06:54-07:00</Time>
     </Item>
     <Item>
       <Source>Images\pressureplate.png</Source>
@@ -270,6 +270,15 @@
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Projects\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox7.xnb</Output>
       <Time>2014-10-30T14:40:10.9228924-06:00</Time>
+    </Item>
+    <Item>
+      <Source>Sounds\music.wav</Source>
+      <Name>Sounds\music</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Projects\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Sounds\music.xnb</Output>
+      <Time>2014-11-13T14:34:12.6518485-07:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

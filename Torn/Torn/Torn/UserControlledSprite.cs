@@ -22,6 +22,7 @@ namespace Torn
         int obstacleIndex;
         List<Sprite> obstacles;
         List<Sprite> trench;
+        List<Vector2> indexes;
 
         public UserControlledSprite(Game game, String textureFile, Vector2 position, bool isArms, bool isLegs)
             : base(game, textureFile, position)
@@ -222,6 +223,7 @@ namespace Torn
                     moving = false;
                     direction = '-';
                     steps = MyGlobals.steps;
+
                 }
 
                 if (keyboard.IsKeyDown(Keys.Down) && keyboard.IsKeyDown(Keys.LeftShift))
@@ -614,6 +616,44 @@ namespace Torn
                 }
             }
             return false;
+        }
+
+        public List<Vector2> hidden(List<Vector2> positions, char direction)
+        {
+
+            indexes = new List<Vector2>();
+            switch (direction)
+            {
+                case 'd':
+                    for (int i = 0; i < positions.Count; i++)
+                    {
+                        if (this.position.Y < positions[i].Y)
+                            indexes.Add(positions[i]);
+                    }
+                    break;
+                case 'u':
+                    for (int i = 0; i < positions.Count; i++)
+                    {
+                        if (this.position.Y > positions[i].Y)
+                            indexes.Add(positions[i]);
+                    }
+                    break;
+                case 'l':
+                    for (int i = 0; i < positions.Count; i++)
+                    {
+                        if (this.position.X > positions[i].X)
+                            indexes.Add(positions[i]);
+                    }
+                    break;
+                case 'r':
+                    for (int i = 0; i < positions.Count; i++)
+                    {
+                        if (this.position.X < positions[i].X)
+                            indexes.Add(positions[i]);
+                    }
+                    break;
+            }
+            return indexes;
         }
     }
 }

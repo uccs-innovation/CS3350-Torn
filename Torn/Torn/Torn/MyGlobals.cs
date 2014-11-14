@@ -24,6 +24,10 @@ namespace Torn
         public static int plates {get; set;}
         public static int bridges { get; set; }
         public static float scale { get; set; }
+        public static float realHeigh { get; set; }
+        public static float realWidth{ get; set; }
+        public static float zeroX { get; set; }
+        public static float zeroY { get; set; }
 
     }
 }

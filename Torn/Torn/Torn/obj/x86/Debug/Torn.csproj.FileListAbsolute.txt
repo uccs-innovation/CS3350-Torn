@@ -55,3 +55,8 @@ C:\Users\Cristiano\Projects\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Ima
 C:\Users\Cristiano\Projects\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox5.xnb
 C:\Users\Cristiano\Projects\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox6.xnb
 C:\Users\Cristiano\Projects\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox7.xnb
+C:\Users\Cristiano\Projects\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Sounds\music.xnb
+C:\Users\Cristiano\Projects\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Torn.exe.manifest
+C:\Users\Cristiano\Projects\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Torn.application
+C:\Users\Cristiano\Projects\CS3350-Torn\Torn\Torn\Torn\obj\x86\Debug\Torn.exe.manifest
+C:\Users\Cristiano\Projects\CS3350-Torn\Torn\Torn\Torn\obj\x86\Debug\Torn.application
