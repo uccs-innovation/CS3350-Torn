@@ -30,11 +30,6 @@
     <Reference Include="Microsoft.Xna.Framework.Content.Pipeline.VideoImporters, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Images\GrayBlock.png">
-      <Name>GrayBlock</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
     <Compile Include="Images\InitialScreen.png">
       <Name>InitialScreen</Name>
       <Importer>TextureImporter</Importer>
@@ -101,11 +96,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Images\Blindness2.png">
-      <Name>Blindness2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
     <Compile Include="Images\bridge.png">
       <Name>bridge</Name>
       <Importer>TextureImporter</Importer>
@@ -118,11 +108,6 @@
     </Compile>
     <Compile Include="Images\grass.png">
       <Name>grass</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Images\immovablebox.png">
-      <Name>immovablebox</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -159,11 +144,6 @@
   <ItemGroup>
     <Compile Include="Images\blankBox.png">
       <Name>blankBox</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Images\bridge3.png">
-      <Name>bridge3</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

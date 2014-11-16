@@ -18,7 +18,7 @@ namespace Torn
         KeyboardState keyboard;
         bool update, moving, isArms, isLegs, isVisible, pulling, stoped;
         char direction;
-        int steps;
+        int steps, legsIndex, armsIndex;
         int obstacleIndex;
         List<Sprite> obstacles;
         List<Sprite> trench;
@@ -37,6 +37,20 @@ namespace Torn
             this.isArms = isArms;
             this.isLegs = isLegs;
             isVisible = true;
+            legsIndex = 0;
+            armsIndex = 0;
+           
+            if(isLegs)
+            {
+                rectangle = new Rectangle(0, 0, (int) MyGlobals.realBlockSize, (int) MyGlobals.realBlockSize);
+                center2 = new Vector2(15, 15);
+            }
+
+            if(isArms)
+            {
+                rectangle = new Rectangle(90, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                center2 = new Vector2(15, 15);
+            }
         }
 
         public bool IsVisible
@@ -77,6 +91,8 @@ namespace Torn
                 {
                     if (keyboard.IsKeyDown(Keys.LeftShift))
                         pulling = true;
+                    legsIndex = 1;
+                    armsIndex = 1;
                     direction = 'd';
                     moving = true;
                     stoped = true;
@@ -85,6 +101,8 @@ namespace Torn
                 {
                     if (keyboard.IsKeyDown(Keys.LeftShift))
                         pulling = true;
+                    legsIndex = 2;
+                    armsIndex = 2;
                     direction = 'u';
                     moving = true;
                     stoped = true;
@@ -93,6 +111,8 @@ namespace Torn
                 {
                     if (keyboard.IsKeyDown(Keys.LeftShift))
                         pulling = true;
+                    legsIndex = 3;
+                    armsIndex = 3;
                     direction = 'l';
                     moving = true;
                     stoped = true;
@@ -101,6 +121,8 @@ namespace Torn
                 {
                     if (keyboard.IsKeyDown(Keys.LeftShift))
                         pulling = true;
+                    legsIndex = 4;
+                    armsIndex = 4;
                     direction = 'r';
                     moving = true;
                     stoped = true;
@@ -123,17 +145,41 @@ namespace Torn
                             {
                                 obstacles[obstacleIndex].Y += MyGlobals.blockSize / 10;
                                 this.position.Y += MyGlobals.blockSize / 10;
+                                if(isLegs && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle(((steps % 2) + 1) * (int)MyGlobals.realBlockSize, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
+                                if (isArms && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 120, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
                                 steps--;
                             }
                             else if (hasObstacle(obstacles, 'd') && isArms && obstacleIndex != -1)
                             {
                                 obstacles[obstacleIndex].Y += MyGlobals.blockSize / 10;
                                 this.position.Y += MyGlobals.blockSize / 10;
+                                if (isLegs && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle(((steps % 2) + 1) * (int)MyGlobals.realBlockSize, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
+                                if (isArms && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 120, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
                                 steps--;
                             }
                             else if (!hasObstacle(obstacles, 'd'))
                             {
                                 this.position.Y += MyGlobals.blockSize / 10;
+                                if (isLegs && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle(((steps % 2) + 1) * (int)MyGlobals.realBlockSize, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
+                                if (isArms && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 120, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
                                 steps--;
                             }
                             break;
@@ -148,17 +194,42 @@ namespace Torn
                             {
                                 obstacles[obstacleIndex].Y -= MyGlobals.blockSize / 10;
                                 this.position.Y -= MyGlobals.blockSize / 10;
+                                if (isLegs && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * ((int)MyGlobals.realBlockSize) + 120, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
+                                if (isArms && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle(((steps % 2) + 1) * (int)MyGlobals.realBlockSize, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
                                 steps--;
                             }
                             else if (hasObstacle(obstacles, 'u') && isArms && obstacleIndex != -1)
                             {
                                 obstacles[obstacleIndex].Y -= MyGlobals.blockSize / 10;
                                 this.position.Y -= MyGlobals.blockSize / 10;
+                                if (isLegs && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * ((int)MyGlobals.realBlockSize) + 120, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
+                                if (isArms && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle(((steps % 2) + 1) * (int)MyGlobals.realBlockSize, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
                                 steps--;
                             }
                             else if (!hasObstacle(obstacles, 'u'))
                             {
                                 this.position.Y -= MyGlobals.blockSize / 10;
+                                if (isLegs && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * ((int)MyGlobals.realBlockSize) + 120, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
+                                if (isArms && steps % 5 == 0)
+                                {
+                                    int teste = (steps % 2) * (int)MyGlobals.realBlockSize + 120;
+                                    base.Rectangle = new Rectangle(((steps % 2) + 1) * (int)MyGlobals.realBlockSize, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
                                 steps--;
                             }
                             break;
@@ -173,17 +244,41 @@ namespace Torn
                             {
                                 obstacles[obstacleIndex].X += MyGlobals.blockSize / 10;
                                 this.position.X += MyGlobals.blockSize / 10;
+                                if (isLegs && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 300, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
+                                if (isArms && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 300, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
                                 steps--;
                             }
                             else if (hasObstacle(obstacles, 'r') && isArms && obstacleIndex != -1)
                             {
                                 obstacles[obstacleIndex].X += MyGlobals.blockSize / 10;
                                 this.position.X += MyGlobals.blockSize / 10;
+                                if (isLegs && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * ((int)MyGlobals.realBlockSize) + 300, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
+                                if (isArms && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 300, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
                                 steps--;
                             }
                             else if (!hasObstacle(obstacles, 'r'))
                             {
                                 this.position.X += MyGlobals.blockSize / 10;
+                                if (isLegs && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * ((int)MyGlobals.realBlockSize) + 300, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
+                                if (isArms && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 300, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
                                 steps--;
                             }
                             break;
@@ -198,17 +293,42 @@ namespace Torn
                             {
                                 obstacles[obstacleIndex].X -= MyGlobals.blockSize / 10;
                                 this.position.X -= MyGlobals.blockSize / 10;
+                                if (isLegs && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * ((int)MyGlobals.realBlockSize) + 210, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
+                                if (isArms && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2)* (int)MyGlobals.realBlockSize + 210, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
                                 steps--;
                             }
                             else if (hasObstacle(obstacles, 'l') && isArms && obstacleIndex != -1)
                             {
                                 obstacles[obstacleIndex].X -= MyGlobals.blockSize / 10;
                                 this.position.X -= MyGlobals.blockSize / 10;
+                                if (isLegs && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * ((int)MyGlobals.realBlockSize) + 210, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
+                                if (isArms && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 210, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
                                 steps--;
                             }
                             else if (!hasObstacle(obstacles, 'l'))
                             {
+
                                 this.position.X -= MyGlobals.blockSize / 10;
+                                if (isLegs && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * ((int)MyGlobals.realBlockSize) + 210, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                } 
+                                if (isArms && steps % 5 == 0)
+                                {
+                                    base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 210, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                }
                                 steps--;
                             }
                             break;
@@ -221,9 +341,46 @@ namespace Torn
                 {
                     pulling = false;
                     moving = false;
-                    direction = '-';
                     steps = MyGlobals.steps;
+                    if (isLegs)
+                    {
+                        switch (direction)
+                        {
+                            case 'd':
+                                rectangle = new Rectangle(0, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                                break;
+                            case 'u':
+                                rectangle = new Rectangle(90, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                                break;
+                            case 'l':
+                                rectangle = new Rectangle(180, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                                break;
+                            case 'r':
+                                rectangle = new Rectangle(270, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                                break;
+                        }
+                    }
 
+                    if (isArms)
+                    {
+                        switch (direction)
+                        {
+                            case 'd':
+                                rectangle = new Rectangle(90, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                                break;
+                            case 'u':
+                                rectangle = new Rectangle(0, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                                break;
+                            case 'l':
+                                rectangle = new Rectangle(180, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                                break;
+                            case 'r':
+                                rectangle = new Rectangle(270, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                                break;
+                        }
+                    }
+
+                    direction = '-';
                 }
 
                 if (keyboard.IsKeyDown(Keys.Down) && keyboard.IsKeyDown(Keys.LeftShift))

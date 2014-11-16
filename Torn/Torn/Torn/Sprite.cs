@@ -18,8 +18,10 @@ namespace Torn
         protected Texture2D texture;
         protected Vector2 position;
         protected Vector2 center;
+        protected Vector2 center2;
         protected Color color;
         protected Random random;
+        protected Rectangle rectangle;
 
         public Vector2 Position
         {
@@ -39,6 +41,12 @@ namespace Torn
             set { position.Y = value; }
         }
 
+        public Rectangle Rectangle
+        {
+            get { return rectangle; }
+            set { rectangle = value; }
+        }
+
         public Sprite(Game game, String textureFile, Vector2 position)
             : base(game)
         {
@@ -46,6 +54,7 @@ namespace Torn
             this.position = position;
             color = Color.White;
             random = new Random();
+            rectangle = new Rectangle(0,0,0,0);
             LoadContent();
         }
 
@@ -71,7 +80,10 @@ namespace Torn
             SpriteBatch sb = ((Game1)this.Game).spriteBatch;
 
             sb.Begin();
-            sb.Draw(texture, position, null, color, 0f, center, MyGlobals.scale, SpriteEffects.None, 0f);
+            if(rectangle.Equals(new Rectangle(0,0,0,0)))
+                sb.Draw(texture, position, null, color, 0f, center, MyGlobals.scale, SpriteEffects.None, 0f);
+            else
+                sb.Draw(texture, position, rectangle, color, 0f, center2, MyGlobals.scale, SpriteEffects.None, 0f);
             sb.End();
             
 

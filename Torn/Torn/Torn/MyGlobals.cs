@@ -11,6 +11,7 @@ namespace Torn
         public static int width { get; set; }
         public static int heigh { get; set; }
         public static float blockSize { get; set; }
+        public static float realBlockSize { get; set; }
         public static int steps { get; set; }
         public static int outOfSize { get; set; }
         public static int empty { get; set; }

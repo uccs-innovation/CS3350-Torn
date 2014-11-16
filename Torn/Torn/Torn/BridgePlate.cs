@@ -49,7 +49,7 @@ namespace Torn
             color = Color.White;
             random = new Random();
             platePressed = false;
-            int aux = (int)MyGlobals.blockSize / 2;
+            int aux = (int) MyGlobals.realBlockSize;
             bridgeRecOff = new Rectangle(aux, 0, aux, aux);
             bridgeRecOn = new Rectangle(0, 0, aux, aux);
             LoadContent();
