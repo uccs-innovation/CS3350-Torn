@@ -17,7 +17,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\Arms.xnb</Output>
-      <Time>2014-11-15T22:21:08.7035397-07:00</Time>
+      <Time>2014-11-16T15:38:29.7785069-07:00</Time>
     </Item>
     <Item>
       <Source>Images\Head.png</Source>
@@ -62,7 +62,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\Block.xnb</Output>
-      <Time>2014-11-12T12:06:42-07:00</Time>
+      <Time>2014-11-16T16:08:40.6720678-07:00</Time>
     </Item>
     <Item>
       <Source>Images\final.png</Source>
@@ -89,7 +89,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\bridge.xnb</Output>
-      <Time>2014-10-29T23:54:36.2232041-06:00</Time>
+      <Time>2014-11-16T16:32:47.2457665-07:00</Time>
     </Item>
     <Item>
       <Source>Images\filledpit.png</Source>
@@ -98,7 +98,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\filledpit.xnb</Output>
-      <Time>2014-11-12T12:11:00-07:00</Time>
+      <Time>2014-11-16T15:58:28.7966325-07:00</Time>
     </Item>
     <Item>
       <Source>Images\grass.png</Source>
@@ -146,85 +146,13 @@
       <Time>2014-10-29T21:40:19.6001793-06:00</Time>
     </Item>
     <Item>
-      <Source>Images\textBox.png</Source>
-      <Name>Images\textBox</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox.xnb</Output>
-      <Time>2014-10-30T14:32:48.1438131-06:00</Time>
-    </Item>
-    <Item>
       <Source>Images\blankBox.png</Source>
       <Name>Images\blankBox</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\blankBox.xnb</Output>
-      <Time>2014-10-30T14:48:27.2788817-06:00</Time>
-    </Item>
-    <Item>
-      <Source>Images\textBox1.png</Source>
-      <Name>Images\textBox1</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox1.xnb</Output>
-      <Time>2014-10-30T14:35:11.669356-06:00</Time>
-    </Item>
-    <Item>
-      <Source>Images\textBox2.png</Source>
-      <Name>Images\textBox2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox2.xnb</Output>
-      <Time>2014-10-30T14:36:01.6991758-06:00</Time>
-    </Item>
-    <Item>
-      <Source>Images\textBox3.png</Source>
-      <Name>Images\textBox3</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox3.xnb</Output>
-      <Time>2014-10-30T14:36:33.2270211-06:00</Time>
-    </Item>
-    <Item>
-      <Source>Images\textBox4.png</Source>
-      <Name>Images\textBox4</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox4.xnb</Output>
-      <Time>2014-10-30T14:38:27.6613157-06:00</Time>
-    </Item>
-    <Item>
-      <Source>Images\textBox5.png</Source>
-      <Name>Images\textBox5</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox5.xnb</Output>
-      <Time>2014-10-30T14:38:27.6613157-06:00</Time>
-    </Item>
-    <Item>
-      <Source>Images\textBox6.png</Source>
-      <Name>Images\textBox6</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox6.xnb</Output>
-      <Time>2014-10-30T14:39:34.2905972-06:00</Time>
-    </Item>
-    <Item>
-      <Source>Images\textBox7.png</Source>
-      <Name>Images\textBox7</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox7.xnb</Output>
-      <Time>2014-10-30T14:40:10.9228924-06:00</Time>
+      <Time>2014-11-17T16:50:28.9825179-07:00</Time>
     </Item>
     <Item>
       <Source>Verdana.spritefont</Source>
@@ -243,6 +171,24 @@
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Sounds\music.xnb</Output>
       <Time>2014-11-13T14:34:12.6518485-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Images\highlightedGrass.png</Source>
+      <Name>Images\highlightedGrass</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\highlightedGrass.xnb</Output>
+      <Time>2014-11-17T15:49:06.5472347-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Images\enter.png</Source>
+      <Name>Images\enter</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\enter.xnb</Output>
+      <Time>2014-11-18T20:49:17.9634003-07:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

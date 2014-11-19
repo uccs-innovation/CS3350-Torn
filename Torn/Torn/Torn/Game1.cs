@@ -21,7 +21,7 @@ namespace Torn
         bool started;
         KeyboardState keyboard;
         UserControlledSprite[] body;
-        Sprite blindness;
+        Sprite blindness, highlightedGrass;
         int[,] field;
         List<Vector2> blockSight;
         List<Sprite> trench;
@@ -30,15 +30,20 @@ namespace Torn
         List<Vector2> bridgesPosition;
         List<Vector2> platesPosition;
         List<Sprite> brokenBridges;
+        List<Sprite> grasses;
+        List<Sprite> walls;
         int[] finished;
-        Sprite levelEnd, aux;
+        Sprite levelEnd, aux, textBox;
         List<Vector2> indexesBellow, indexesRight, indexesLeft, indexesAbove;
         List<Sprite> hiddenAbove, hiddenBellow, hiddenRight, hiddenLeft;
         SoundEffect ambientSound;
         SoundEffectInstance instance;
         Text text;
         String tutorial;
-        int countBellow, countAbove, countLeft, countRight;
+        int countBellow, countAbove, countLeft, countRight, messageIndex;
+        KeyboardState old;
+        int levelNumber, levelAux;
+        Sprite enter;
 
         public Game1()
         {
@@ -47,7 +52,7 @@ namespace Torn
             //graphics.IsFullScreen = true;
             
             //Initialize all the global variables
-            MyGlobals.width = 420 * 2;
+            MyGlobals.width = 480 * 2;
             MyGlobals.heigh = 420 * 2;
             MyGlobals.realBlockSize = 30;
             MyGlobals.blockSize = MyGlobals.realBlockSize * 2;
@@ -65,16 +70,21 @@ namespace Torn
             MyGlobals.plates = 8;
             MyGlobals.bridges = 9;
             MyGlobals.outOfSize = 10;
-            MyGlobals.numberOfBlocks = 14;
+            MyGlobals.numberOfBlocksX = 16;
+            MyGlobals.numberOfBlocksY = 14;
 
-            tutorial = "Welcome to Torn. Currently, your body is separated into three \npieces. To begin playing, move your head right \npressing H and then the right arrow.";
+            tutorial = "Welcome to Torn. Currently, your body is separated into three pieces. You \ncan alternate between these parts pressing A to select Arms, H to select \nhead and L to select legs.";
 
             graphics.PreferredBackBufferWidth = MyGlobals.width;
             graphics.PreferredBackBufferHeight = MyGlobals.heigh;
 
+            messageIndex = 0;
+            levelNumber = 1;
+            levelAux = levelNumber;
+            
             body = new UserControlledSprite[3];
             started = false;
-            field = new int[MyGlobals.numberOfBlocks, MyGlobals.numberOfBlocks];
+            field = new int[MyGlobals.numberOfBlocksY, MyGlobals.numberOfBlocksX];
             trench = new List<Sprite>();
             obstacles = new List<Sprite>();
             bridgePlates = new List<BridgePlate>();
@@ -82,6 +92,7 @@ namespace Torn
             platesPosition = new List<Vector2>();
             brokenBridges = new List<Sprite>();
             blockSight = new List<Vector2>();
+            walls = new List<Sprite>();
 
             indexesAbove = new List<Vector2>();
             indexesBellow = new List<Vector2>();
@@ -94,28 +105,28 @@ namespace Torn
             hiddenRight = new List<Sprite>();
 
             finished = new int[3] { 0, 0, 0 };
-            readField();
+            
 
-            //ambientSound = Content.Load<SoundEffect>(@"Sounds\music");
-            //instance = ambientSound.CreateInstance();
-            //instance.IsLooped = true;
-            //ambientSound.Play();
+            old = new KeyboardState();
+
+            ambientSound = Content.Load<SoundEffect>(@"Sounds\music");
+            instance = ambientSound.CreateInstance();
+            instance.IsLooped = true;
+            ambientSound.Play();
 
         }
-        
         protected override void Initialize()
         {
             //Makes the mouse pointer visible
             this.IsMouseVisible = true;
             base.Initialize();
         }
-
-        public void readField()
+        public void readField(String levelName)
         {
             string line;
             int i = 0, j = 0, lastJ = 0, lastI = 0, result = 0, rest = 0;
 
-            System.IO.StreamReader file = new System.IO.StreamReader(@"Levels\tutorial.txt");
+            System.IO.StreamReader file = new System.IO.StreamReader(@"Levels\level"+levelName+".txt");
             while ((line = file.ReadLine()) != null)
             {
                 while (j * 2 < line.Length)
@@ -130,28 +141,28 @@ namespace Torn
 
             lastI = i;
 
-            if (lastJ < MyGlobals.numberOfBlocks)
+            if (lastJ < MyGlobals.numberOfBlocksX)
             {
-                int aux = MyGlobals.numberOfBlocks - lastJ;
+                int aux = MyGlobals.numberOfBlocksX - lastJ;
 
                 result = aux / 2;
                 rest = aux - result;
 
-                for (i = 0; i < MyGlobals.numberOfBlocks; i++)
+                for (i = 0; i < MyGlobals.numberOfBlocksY; i++)
                 {
-                    for (j = MyGlobals.numberOfBlocks - rest -1; j >= result; j--)
+                    for (j = MyGlobals.numberOfBlocksX - rest -1; j >= result; j--)
                     {
                         field[i, j] = field[i, j - result];
                     }
                 }
 
-                for (i = 0; i < MyGlobals.numberOfBlocks; i++)
+                for (i = 0; i < MyGlobals.numberOfBlocksY; i++)
                 {
                     for (j = 0; j < result; j++)
                     {
                         field[i, j] = MyGlobals.outOfSize;
                     }
-                    for (j = MyGlobals.numberOfBlocks -1; j > MyGlobals.numberOfBlocks - rest - 1; j--)
+                    for (j = MyGlobals.numberOfBlocksX -1; j > MyGlobals.numberOfBlocksX - rest - 1; j--)
                     {
                         field[i, j] = MyGlobals.outOfSize;
                     }
@@ -160,28 +171,28 @@ namespace Torn
             MyGlobals.zeroX = MyGlobals.blockSize * result;
             MyGlobals.realWidth = MyGlobals.blockSize * lastJ + MyGlobals.blockSize * result;
 
-            if (lastI < MyGlobals.numberOfBlocks)
+            if (lastI < MyGlobals.numberOfBlocksY)
             {
-                int aux = MyGlobals.numberOfBlocks - lastI;
+                int aux = MyGlobals.numberOfBlocksY - lastI;
                 
                 result = aux / 2;
                 rest = aux - result;
 
-                for (i = 0; i < MyGlobals.numberOfBlocks; i++)
+                for (i = 0; i < MyGlobals.numberOfBlocksX; i++)
                 {
-                    for (j = MyGlobals.numberOfBlocks - rest - 1; j >= result; j--)
+                    for (j = MyGlobals.numberOfBlocksY - rest - 1; j >= result; j--)
                     {
                         field[j, i] = field[j - result, i];
                     }
                 }
 
-                for (i = 0; i < MyGlobals.numberOfBlocks; i++)
+                for (i = 0; i < MyGlobals.numberOfBlocksX; i++)
                 {
                     for (j = 0; j < result; j++)
                     {
                         field[j, i] = MyGlobals.outOfSize;
                     }
-                    for (j = MyGlobals.numberOfBlocks - 1; j > MyGlobals.numberOfBlocks - rest - 1; j--)
+                    for (j = MyGlobals.numberOfBlocksY - 1; j > MyGlobals.numberOfBlocksY - rest - 1; j--)
                     {
                         field[j, i] = MyGlobals.outOfSize;
                     }
@@ -194,9 +205,9 @@ namespace Torn
 
             using (TextWriter tw = new StreamWriter(@"Levels\levelTeste.txt"))
             {
-                for (j = 0; j < MyGlobals.numberOfBlocks; j++)
+                for (j = 0; j < MyGlobals.numberOfBlocksY; j++)
                 {
-                    for (i = 0; i < MyGlobals.numberOfBlocks; i++)
+                    for (i = 0; i < MyGlobals.numberOfBlocksX; i++)
                     {
                         tw.Write(field[j, i] + " ");
                     }
@@ -204,16 +215,19 @@ namespace Torn
                 }
             }
         }
-
         protected override void LoadContent()
         {
             //Displays the initial screen
             
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            readField(levelNumber.ToString());
+
+            highlightedGrass = new Sprite(this, @"Images\highlightedGrass", new Vector2(0, 0));
+            grasses = new List<Sprite>();
+
             if (!started)
             {
-                
                 initialPosition.X = graphics.PreferredBackBufferWidth / 2;
                 initialPosition.Y = graphics.PreferredBackBufferHeight / 2;
                 initialScreen = new Sprite(this, @"Images\InitialScreen", initialPosition);
@@ -221,30 +235,55 @@ namespace Torn
             }
             else if(levelFinished())
             {
+                trench = new List<Sprite>();
+                obstacles = new List<Sprite>();
+                bridgePlates = new List<BridgePlate>();
+                bridgesPosition = new List<Vector2>();
+                platesPosition = new List<Vector2>();
+                brokenBridges = new List<Sprite>();
+                blockSight = new List<Vector2>();
+                walls = new List<Sprite>();
+
+                indexesAbove = new List<Vector2>();
+                indexesBellow = new List<Vector2>();
+                indexesLeft = new List<Vector2>();
+                indexesRight = new List<Vector2>();
+
+                hiddenAbove = new List<Sprite>();
+                hiddenBellow = new List<Sprite>();
+                hiddenLeft = new List<Sprite>();
+                hiddenRight = new List<Sprite>();
+
                 initialPosition.X = graphics.PreferredBackBufferWidth / 2;
                 initialPosition.Y = graphics.PreferredBackBufferHeight / 2;
                 levelEnd = new Sprite(this, @"Images\levelEnd1", initialPosition);
                 Components.Add(levelEnd);
+                finished[0] = 0;
+                finished[1] = 0;
+                finished[2] = 0;
+                readField(levelNumber.ToString());
             }
-            else
+            
+            if (started)
             {
                 //Takes the initial screen off and displays the body parts
                 Components.Remove(initialScreen);
 
-                for (int i = 0; i < MyGlobals.numberOfBlocks; i++)
+                for (int i = 0; i < MyGlobals.numberOfBlocksY; i++)
                 {
-                    for (int j = 0; j < MyGlobals.numberOfBlocks; j++)
+                    for (int j = 0; j < MyGlobals.numberOfBlocksX; j++)
                     {
                         initialPosition.X = (j + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
                         initialPosition.Y = (i + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
                         aux = new Sprite(this, @"Images\grass", initialPosition);
+                        grasses.Add(aux);
                         Components.Add(aux);
                     }
                 }
 
-                for (int i = 0; i < MyGlobals.numberOfBlocks; i++)
+                for (int i = 0; i < MyGlobals.numberOfBlocksY; i++)
                 {
-                    for (int j = 0; j < MyGlobals.numberOfBlocks; j++)
+                    for (int j = 0; j < MyGlobals.numberOfBlocksX; j++)
                     {
                         if (field[i, j] == MyGlobals.outOfSize)
                         {
@@ -252,14 +291,15 @@ namespace Torn
                             initialPosition.Y = (i + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
                             aux = new Sprite(this, @"Images\edge", initialPosition);
                             Components.Add(aux);
-                            trench.Add(aux);
+                            //trench.Add(aux);
+                            walls.Add(aux);
                         }
                     }
                 }
 
-                for (int i = 0; i < MyGlobals.numberOfBlocks; i++)
+                for (int i = 0; i < MyGlobals.numberOfBlocksY; i++)
                 {
-                    for (int j = 0; j < MyGlobals.numberOfBlocks; j++)
+                    for (int j = 0; j < MyGlobals.numberOfBlocksX; j++)
                     {
                         if (field[i, j] == MyGlobals.plates)
                         {
@@ -270,9 +310,9 @@ namespace Torn
                     }
                 }
 
-                for (int i = 0; i < MyGlobals.numberOfBlocks; i++)
+                for (int i = 0; i < MyGlobals.numberOfBlocksY; i++)
                 {
-                    for (int j = 0; j < MyGlobals.numberOfBlocks; j++)
+                    for (int j = 0; j < MyGlobals.numberOfBlocksX; j++)
                     {
                         if (field[i, j] == MyGlobals.bridges)
                         {
@@ -286,7 +326,7 @@ namespace Torn
 
                 for (int i = 0; i < brokenBridges.Count; i++)
                 {
-                    trench.Add(brokenBridges[i]);
+                    walls.Add(brokenBridges[i]);
                 }
 
                 for (int i = 0; i < bridgesPosition.Count; i++)
@@ -295,10 +335,9 @@ namespace Torn
                     Components.Add(bridgePlates[i]);
                 }
                 
-                //Initializes the body parts in divisible by three positions, in order to make the grid effect during the movement
-                for (int i = 0; i < MyGlobals.numberOfBlocks; i++)
+                for (int i = 0; i < MyGlobals.numberOfBlocksY; i++)
                 {
-                    for (int j = 0; j < MyGlobals.numberOfBlocks; j++)
+                    for (int j = 0; j < MyGlobals.numberOfBlocksX; j++)
                     {
                         if (field[i, j] == MyGlobals.trench)
                         {
@@ -310,15 +349,16 @@ namespace Torn
                         }
                     }
                 }
-                for (int i = 0; i < MyGlobals.numberOfBlocks; i++)
+                for (int i = 0; i < MyGlobals.numberOfBlocksY; i++)
                 {
-                    for (int j = 0; j < MyGlobals.numberOfBlocks; j++)
+                    for (int j = 0; j < MyGlobals.numberOfBlocksX; j++)
                     {
                         if (field[i, j] == MyGlobals.obstacle)
                         {
                             initialPosition.X = (j + 1) * MyGlobals.blockSize - MyGlobals.blockSize/2;
                             initialPosition.Y = (i + 1) * MyGlobals.blockSize - MyGlobals.blockSize/2;
                             aux = new Sprite(this, @"Images\Block", initialPosition);
+                            aux.Rectangle = new Rectangle(0, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
                             obstacles.Add(aux);
                             Components.Add(aux);
                         }
@@ -333,9 +373,9 @@ namespace Torn
                     }
                 }
 
-                for (int i = 0; i < MyGlobals.numberOfBlocks; i++)
+                for (int i = 0; i < MyGlobals.numberOfBlocksY; i++)
 			    {
-                    for (int j = 0; j < MyGlobals.numberOfBlocks; j++)
+                    for (int j = 0; j < MyGlobals.numberOfBlocksX; j++)
 			        {
                         if (field[i, j] == MyGlobals.head)
                         {
@@ -344,14 +384,14 @@ namespace Torn
                             body[0] = new UserControlledSprite(this, @"Images\Head", initialPosition, false, false);
                             Components.Add(body[0]);
                         }
-                        else if (field[i, j] == MyGlobals.arms)
+                        if (field[i, j] == MyGlobals.arms)
                         {
                             initialPosition.X = (j + 1) * MyGlobals.blockSize - MyGlobals.blockSize/2;
                             initialPosition.Y = (i+ 1) * MyGlobals.blockSize - MyGlobals.blockSize/2;
                             body[1] = new UserControlledSprite(this, @"Images\Arms", initialPosition, true, false);
                             Components.Add(body[1]);
                         }
-                        else if (field[i, j] == MyGlobals.legs)
+                        if (field[i, j] == MyGlobals.legs)
                         {
                             initialPosition.X = (j + 1) * MyGlobals.blockSize - MyGlobals.blockSize/2;
                             initialPosition.Y = (i + 1) * MyGlobals.blockSize - MyGlobals.blockSize/2;
@@ -361,9 +401,9 @@ namespace Torn
                     }
                 }
 
-                for (int i = 0; i < MyGlobals.numberOfBlocks; i++)
+                for (int i = 0; i < MyGlobals.numberOfBlocksY; i++)
                 {
-                    for (int j = 0; j < MyGlobals.numberOfBlocks; j++)
+                    for (int j = 0; j < MyGlobals.numberOfBlocksX; j++)
                     {
                         if (field[i, j] == MyGlobals.blocksVision)
                         {
@@ -371,7 +411,8 @@ namespace Torn
                             initialPosition.Y = (i + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
                             aux = new Sprite(this, @"Images\BlockVision", initialPosition);
                             blockSight.Add(aux.Position);
-                            trench.Add(aux);
+                            //trench.Add(aux);
+                            walls.Add(aux);
                             Components.Add(aux);
                         }
                     }
@@ -383,6 +424,10 @@ namespace Torn
                 body[0].Trench = trench;
                 body[1].Trench = trench;
                 body[2].Trench = trench;
+
+                body[0].Walls = walls;
+                body[1].Walls = walls;
+                body[2].Walls = walls;
 
                 body[0].Trench.Add(body[1]);
                 body[0].Trench.Add(body[2]);
@@ -396,22 +441,27 @@ namespace Torn
 
                 body[1].Obstacles = obstacles;
 
-                Components.Add(blindness);
+                //Components.Add(blindness);
 
-                text = new Text(this, new Vector2(100f, 100f), @"Verdana", tutorial, Color.White);
-                Components.Add(text);
+
+                //TUTORIAL
+                if(levelNumber == 1)
+                {
+                    textBox = new Sprite(this, @"Images\blankBox", new Vector2(MyGlobals.width / 2, MyGlobals.blockSize * 2));
+                    Components.Add(textBox);
+                    text = new Text(this, new Vector2(20f, 80f), @"Verdana", tutorial, Color.Black);
+                    Components.Add(text);
+                    enter = new Sprite(this, @"Images\enter", new Vector2(MyGlobals.width - MyGlobals.blockSize / 2 , 3 * MyGlobals.blockSize - MyGlobals.blockSize / 2));
+                }
+                
 
             }
 
         }
-
-
         protected override void UnloadContent()
         {
            
         }
-
-
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
@@ -419,35 +469,7 @@ namespace Torn
 
             keyboard = Keyboard.GetState();
 
-            if(started)
-            {
-                body[0].Obstacles = body[1].Obstacles;
-                body[2].Obstacles = body[1].Obstacles;
-            }
-
-            //if(started)
-            //{
-            //    if (body[0].Position == new Vector2(3 * MyGlobals.blockSize - MyGlobals.blockSize / 2, 8 * MyGlobals.blockSize - MyGlobals.blockSize / 2))
-            //    {
-            //        text.TextContent = "Welcome to Torn. Currently, your body is separated into three \npieces. To begin playing, move your head right \npressing H and then the right arrow.";
-            //    }
-            //    else if (body[0].Position == new Vector2(4 * MyGlobals.blockSize - MyGlobals.blockSize / 2, 8 * MyGlobals.blockSize - MyGlobals.blockSize / 2))
-            //    {
-            //        text.TextContent = "Now you can see and control your body pieces. Switch through \nyour parts using H, A, L buttons.";
-            //    }
-            //    //else if (body[1].change && body[1].Position == new Vector2(4 * MyGlobals.blockSize - MyGlobals.blockSize / 2, 10 * MyGlobals.blockSize - MyGlobals.blockSize / 2))
-            //    //{
-            //    //    text.TextContent = "The arms are able to push blocks. Press the left arrow to push the \nblock into the trench and create a path";
-            //    //}
-            //    else if (body[1].Position == new Vector2(4 * MyGlobals.blockSize - MyGlobals.blockSize / 2, 10 * MyGlobals.blockSize - MyGlobals.blockSize / 2))
-            //    {
-            //        text.TextContent = "Now you can pass through the bridge.";
-            //    }
-            //    else
-            //    {
-            //        text.TextContent = " ";
-            //    }
-            //}
+           
 
             //Waits for the first ENTER to initialize the game
             if (keyboard.IsKeyDown(Keys.Enter) && !started)
@@ -456,8 +478,118 @@ namespace Torn
                 //Call the method LoadContent() in order to initialize the body parts
                 LoadContent();
             }
+             
+            if(started)
+            {
+                body[0].Obstacles = body[1].Obstacles;
+                body[2].Obstacles = body[1].Obstacles;
+
+                
+            }
+
+            //Tutorial
+            if (started && levelNumber == 1)
+            {
+                if (body[0].Position == new Vector2(4 * MyGlobals.blockSize - MyGlobals.blockSize / 2, 8 * MyGlobals.blockSize - MyGlobals.blockSize / 2))
+                {
+                    switch (messageIndex)
+                    {
+                        case 1:
+                            text.TextContent = "Welcome to Torn. Currently, your body is separated into three pieces. You \ncan alternate between these parts pressing A to select Arms, H to select \nhead and L to select legs.";
+                            if(Components.IndexOf(enter) == -1)    
+                                Components.Add(enter);
+                            break;
+                        case 2:
+                            text.TextContent = "As you can see, some areas of the maze are invisible and you will have to \nmove the head in order to see them.";
+                            break;
+                        case 3:
+                            text.TextContent = "Press H to select the head and then use the arrow keys to move it to the \nhighlighted area.";
+                            Components.Remove(enter);
+                            for (int i = 0; i < grasses.Count; i++)
+                            {
+                                if (grasses[i].Position == new Vector2(7 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 8 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
+                                    grasses[i].Color = Color.LightSeaGreen;
+                            }
+                            messageIndex = 4;
+                            break;
+                    }
+
+                    if (!keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter) && messageIndex < 3)
+                        messageIndex++;
+
+                    old = keyboard;
+
+                }
+                else if (body[0].Position == new Vector2(7 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 8 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
+                {
+                    for (int i = 0; i < grasses.Count; i++)
+                    {
+                        if (grasses[i].Position == new Vector2(7 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 8 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
+                            grasses[i].Color = Color.White;
+                    }
+                    switch (messageIndex)
+                    {
+                        case 4:
+                            text.TextContent = "Now you can see and control your arms. Arms are able to push and pull \nblocks. They can also throw body parts. To throw or pull using your arms, \npress the Left Shift and the direction arrow desired.";
+                            if(Components.IndexOf(enter) == -1)
+                                Components.Add(enter);
+                            break;
+                        case 5:
+                            text.TextContent = "Now, press A to select the arms and then move them to the highlighted \narea.";
+                            Components.Remove(enter);
+                            for (int i = 0; i < grasses.Count; i++)
+                            {
+                                if (grasses[i].Position == new Vector2(7 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 7 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
+                                    grasses[i].Color = Color.LightSeaGreen;
+                            }
+                            break;
+                    }
+
+                    if (!keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter) && messageIndex > 3 && messageIndex < 5)
+                        messageIndex++;
+
+                    old = keyboard;
+                }
+                else if (body[0].Position == new Vector2(10 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 7 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
+                {
+                    for (int i = 0; i < grasses.Count; i++)
+                    {
+                        if (grasses[i].Position == new Vector2(8 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 7 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
+                            grasses[i].Color = Color.White;
+                    }
+                    text.TextContent = "Now place the head on the pressure plate in order to restore the bridge \non the top of the level. Doing that you will be able to jump your legs \nover the trenches";
+                }
+                else if (body[0].Position == new Vector2(11 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 6 * MyGlobals.blockSize + MyGlobals.blockSize / 2) && body[2].Position == new Vector2(4 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 4 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
+                {
+                    text.TextContent = "Excellent! Now press L to select the legs and then jump over the trenches \npressing Left shift and the direction arrows.";
+                }
+
+
+                if (body[1].Position == new Vector2(7 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 7 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
+                {
+                    for (int i = 0; i < grasses.Count; i++)
+                    {
+                        if (grasses[i].Position == new Vector2(7 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 7 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
+                            grasses[i].Color = Color.White;
+                    }
+                    for (int i = 0; i < grasses.Count; i++)
+                    {
+                        if (grasses[i].Position == new Vector2(8 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 7 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
+                            grasses[i].Color = Color.LightSeaGreen;
+                    }
+                    text.TextContent = "Now move the head to the highlighted area and then use the arm to throw it \nover the broken bridge.";
+                }
+
+                if (body[2].Position == new Vector2(8 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 4 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
+                {
+                    text.TextContent = "Now, place the legs on the other pressure plate at the botton of the level. \nDoing this, will enable you to join all of your body parts \nat the final portal.";
+                }
+
+            }
+
+            
             //Checks which part will move according with the user input, if the game is already started and if there is any other body part moving
-            else if (keyboard.IsKeyDown(Keys.H) && started && !isBodyMoving())
+            if (keyboard.IsKeyDown(Keys.H) && started && !isBodyMoving())
             {
                 //If the head was selected, set the bool attribute 'change' in body[0] as true and in the other parts as false, in this way, only the head will move 
                 body[0].change = true;
@@ -594,9 +726,9 @@ namespace Torn
                 //Bellow
                 if (indexesBellow.Count > 0)
                 {
-                    bool exist = false;
                     for (int i = 0; i < indexesBellow.Count; i++)
                     {
+                        bool exist = false;
                         initialPosition = indexesBellow[i];
                         count = (int)((MyGlobals.realHeigh - initialPosition.Y) / MyGlobals.blockSize);
                         for (int j = 0; j < count; j++)
@@ -636,9 +768,9 @@ namespace Torn
                 //Above
                 if (indexesAbove.Count > 0)
                 {
-                    bool exist = false;
                     for (int i = 0; i < indexesAbove.Count; i++)
                     {
+                        bool exist = false;
                         initialPosition = indexesAbove[i];
                         count = (int)((initialPosition.Y - MyGlobals.zeroY) / MyGlobals.blockSize);
                         for (int j = 0; j < count; j++)
@@ -678,9 +810,9 @@ namespace Torn
                 //Left
                 if (indexesLeft.Count > 0)
                 {
-                    bool exist = false;
                     for (int i = 0; i < indexesLeft.Count; i++)
                     {
+                        bool exist = false;
                         initialPosition = indexesLeft[i];
                         count = (int)((initialPosition.X - MyGlobals.zeroX) / MyGlobals.blockSize);
                         for (int j = 0; j < count; j++)
@@ -719,9 +851,9 @@ namespace Torn
                 //RIGHT
                 if (indexesRight.Count > 0)
                 {
-                    bool exist = false;
                     for (int i = 0; i < indexesRight.Count; i++)
                     {
+                        bool exist = false;
                         initialPosition = indexesRight[i];
                         count = (int)((MyGlobals.realWidth - initialPosition.X) / MyGlobals.blockSize);
                         for (int j = 0; j < count; j++)
@@ -785,27 +917,38 @@ namespace Torn
                     finished[2] = 1;
                 }
 
-               if(levelFinished())
-               {
+                if(levelFinished())
+                {
+                    levelNumber++;
                     LoadContent();
-               }
+                    if (levelNumber == 4)
+                        this.Exit();
+                    
+                }
 
                for (int i = 0; i < bridgePlates.Count; i++)
                {
                    if (bridgePlates[i].isPlatePressed(body[0].Position) || bridgePlates[i].isPlatePressed(body[1].Position) || bridgePlates[i].isPlatePressed(body[2].Position))
                    {
-                       trench.Remove(brokenBridges[i]);
+                       walls.Remove(brokenBridges[i]);
                    }
-                   else if (trench.IndexOf(brokenBridges[i]) == -1)
+                   else if (walls.IndexOf(brokenBridges[i]) == -1)
                    {
-                       trench.Add(brokenBridges[i]);
+                       walls.Add(brokenBridges[i]);
                    }
+               }
+
+               if (started)
+               {
+                   body[0].Walls = walls;
+                   body[1].Walls = walls;
+                   body[2].Walls = walls;
                }
             }
 
+            
             base.Update(gameTime);
         }
-
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.White);
@@ -813,7 +956,6 @@ namespace Torn
             base.Draw(gameTime);
             
         }
-
         //Verifies if any part of the body is moving
         public bool isBodyMoving()
         {
@@ -824,7 +966,6 @@ namespace Torn
             }
             return false;
         }
-
         public bool finalized(Vector2 position)
         {
             if (position == finalPosition)
@@ -832,15 +973,14 @@ namespace Torn
             else
                 return false;
         }
-
         public bool levelFinished()
         {
-            for (int i = 0; i < 3; i++)
+            if (finished[0] != 0 && finished[1] != 0 && finished[2] != 0)
             {
-                if (finished[i] == 0)
-                    return false;
+                return true;
             }
-            return true;
+            
+            return false;
         }
     }
 }

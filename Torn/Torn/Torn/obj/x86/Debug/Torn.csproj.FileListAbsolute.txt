@@ -76,15 +76,7 @@ C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Imag
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\pressureplate.xnb
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\pressureplate_grass.xnb
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\BlockVision.xnb
-C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox.xnb
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\blankBox.xnb
-C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox1.xnb
-C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox2.xnb
-C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox3.xnb
-C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox4.xnb
-C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox5.xnb
-C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox6.xnb
-C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\textBox7.xnb
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Verdana.xnb
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Sounds\music.xnb
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Torn.exe.manifest
@@ -97,3 +89,5 @@ C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\obj\x86\Debug\Torn.exe.man
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\obj\x86\Debug\Torn.application
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\obj\x86\Debug\Torn.exe
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\obj\x86\Debug\Torn.pdb
+C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\highlightedGrass.xnb
+C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\enter.xnb

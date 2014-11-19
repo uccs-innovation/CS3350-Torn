@@ -8,14 +8,14 @@
     <framework targetVersion="4.0" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="Torn.exe.manifest" size="15846">
+    <dependentAssembly dependencyType="install" codebase="Torn.exe.manifest" size="13523">
       <assemblyIdentity name="Torn.exe" version="1.0.0.2" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>poO1jXlkS3upou45XlvehEtEdaA=</dsig:DigestValue>
+        <dsig:DigestValue>xbwmLqp3ZIHobbcNvE0ZuPu8JKE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

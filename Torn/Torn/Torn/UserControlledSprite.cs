@@ -16,12 +16,13 @@ namespace Torn
     class UserControlledSprite : Sprite
     {
         KeyboardState keyboard;
-        bool update, moving, isArms, isLegs, isVisible, pulling, stoped;
+        bool update, moving, isArms, isLegs, isVisible, pulling, stoped, pushing;
         char direction;
-        int steps, legsIndex, armsIndex;
+        int steps;
         int obstacleIndex;
         List<Sprite> obstacles;
         List<Sprite> trench;
+        List<Sprite> walls;
         List<Vector2> indexes;
 
         public UserControlledSprite(Game game, String textureFile, Vector2 position, bool isArms, bool isLegs)
@@ -37,20 +38,22 @@ namespace Torn
             this.isArms = isArms;
             this.isLegs = isLegs;
             isVisible = true;
-            legsIndex = 0;
-            armsIndex = 0;
+            pushing = false;
            
             if(isLegs)
             {
                 rectangle = new Rectangle(0, 0, (int) MyGlobals.realBlockSize, (int) MyGlobals.realBlockSize);
-                center2 = new Vector2(15, 15);
             }
 
             if(isArms)
             {
                 rectangle = new Rectangle(90, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
-                center2 = new Vector2(15, 15);
             }
+        }
+        public List<Sprite> Walls
+        {
+            get { return walls; }
+            set { walls = value; }
         }
 
         public bool IsVisible
@@ -79,7 +82,6 @@ namespace Torn
 
         public override void Update(GameTime gameTime)
         {
-            
             if (update)
             {
                 keyboard = Keyboard.GetState();
@@ -91,8 +93,6 @@ namespace Torn
                 {
                     if (keyboard.IsKeyDown(Keys.LeftShift))
                         pulling = true;
-                    legsIndex = 1;
-                    armsIndex = 1;
                     direction = 'd';
                     moving = true;
                     stoped = true;
@@ -101,8 +101,6 @@ namespace Torn
                 {
                     if (keyboard.IsKeyDown(Keys.LeftShift))
                         pulling = true;
-                    legsIndex = 2;
-                    armsIndex = 2;
                     direction = 'u';
                     moving = true;
                     stoped = true;
@@ -111,8 +109,6 @@ namespace Torn
                 {
                     if (keyboard.IsKeyDown(Keys.LeftShift))
                         pulling = true;
-                    legsIndex = 3;
-                    armsIndex = 3;
                     direction = 'l';
                     moving = true;
                     stoped = true;
@@ -121,8 +117,6 @@ namespace Torn
                 {
                     if (keyboard.IsKeyDown(Keys.LeftShift))
                         pulling = true;
-                    legsIndex = 4;
-                    armsIndex = 4;
                     direction = 'r';
                     moving = true;
                     stoped = true;
@@ -135,7 +129,9 @@ namespace Torn
                     switch (direction)
                     {
                         case 'd':
-                            if (hastrench(trench, 'd'))
+                            if (hastrench(trench, 'd') || haswalls(walls, 'd'))
+                                steps = 0;
+                            else if (this.position.Y >= MyGlobals.heigh - MyGlobals.blockSize / 2)
                                 steps = 0;
                             else if (hasObstacle(obstacles, 'd') && !isArms)
                                 steps = 0;
@@ -145,17 +141,18 @@ namespace Torn
                             {
                                 obstacles[obstacleIndex].Y += MyGlobals.blockSize / 10;
                                 this.position.Y += MyGlobals.blockSize / 10;
-                                if(isLegs && steps % 5 == 0)
+                                if (isLegs && steps % 5 == 0)
                                 {
                                     base.Rectangle = new Rectangle(((steps % 2) + 1) * (int)MyGlobals.realBlockSize, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
                                 }
                                 if (isArms && steps % 5 == 0)
                                 {
+                                    pushing = false;
                                     base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 120, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
                                 }
                                 steps--;
                             }
-                            else if (hasObstacle(obstacles, 'd') && isArms && obstacleIndex != -1)
+                            else if (hasObstacle(obstacles, 'd') && isArms && obstacleIndex != -1 && !haswalls(walls, 'd'))
                             {
                                 obstacles[obstacleIndex].Y += MyGlobals.blockSize / 10;
                                 this.position.Y += MyGlobals.blockSize / 10;
@@ -165,6 +162,7 @@ namespace Torn
                                 }
                                 if (isArms && steps % 5 == 0)
                                 {
+                                    pushing = true;
                                     base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 120, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
                                 }
                                 steps--;
@@ -178,13 +176,16 @@ namespace Torn
                                 }
                                 if (isArms && steps % 5 == 0)
                                 {
+                                    pushing = false;
                                     base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 120, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
                                 }
                                 steps--;
                             }
                             break;
                         case 'u':
-                            if (hastrench(trench, 'u'))
+                            if (hastrench(trench, 'u') || haswalls(walls, 'u'))
+                                steps = 0;
+                            else if (this.position.Y <= MyGlobals.blockSize / 2)
                                 steps = 0;
                             else if (hasObstacle(obstacles, 'u') && !isArms)
                                 steps = 0;
@@ -200,20 +201,23 @@ namespace Torn
                                 }
                                 if (isArms && steps % 5 == 0)
                                 {
+                                    pushing = false;
                                     base.Rectangle = new Rectangle(((steps % 2) + 1) * (int)MyGlobals.realBlockSize, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
                                 }
                                 steps--;
                             }
-                            else if (hasObstacle(obstacles, 'u') && isArms && obstacleIndex != -1)
+                            else if (hasObstacle(obstacles, 'u') && isArms && obstacleIndex != -1 && !haswalls(walls, 'u'))
                             {
                                 obstacles[obstacleIndex].Y -= MyGlobals.blockSize / 10;
                                 this.position.Y -= MyGlobals.blockSize / 10;
                                 if (isLegs && steps % 5 == 0)
                                 {
+                                    pushing = false;
                                     base.Rectangle = new Rectangle((steps % 2) * ((int)MyGlobals.realBlockSize) + 120, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
                                 }
                                 if (isArms && steps % 5 == 0)
                                 {
+                                    pushing = true;
                                     base.Rectangle = new Rectangle(((steps % 2) + 1) * (int)MyGlobals.realBlockSize, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
                                 }
                                 steps--;
@@ -227,14 +231,16 @@ namespace Torn
                                 }
                                 if (isArms && steps % 5 == 0)
                                 {
-                                    int teste = (steps % 2) * (int)MyGlobals.realBlockSize + 120;
+                                    pushing = false;
                                     base.Rectangle = new Rectangle(((steps % 2) + 1) * (int)MyGlobals.realBlockSize, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
                                 }
                                 steps--;
                             }
                             break;
                         case 'r':
-                            if (hastrench(trench, 'r'))
+                            if (hastrench(trench, 'r') || haswalls(walls, 'r'))
+                                steps = 0;
+                            else if (this.position.X >= MyGlobals.width - MyGlobals.blockSize / 2)
                                 steps = 0;
                             else if (hasObstacle(obstacles, 'r') && !isArms)
                                 steps = 0;
@@ -250,11 +256,12 @@ namespace Torn
                                 }
                                 if (isArms && steps % 5 == 0)
                                 {
-                                    base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 300, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                    pushing = false;
+                                    base.Rectangle = new Rectangle(360, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
                                 }
                                 steps--;
                             }
-                            else if (hasObstacle(obstacles, 'r') && isArms && obstacleIndex != -1)
+                            else if (hasObstacle(obstacles, 'r') && isArms && obstacleIndex != -1 && !haswalls(walls, 'r'))
                             {
                                 obstacles[obstacleIndex].X += MyGlobals.blockSize / 10;
                                 this.position.X += MyGlobals.blockSize / 10;
@@ -264,7 +271,8 @@ namespace Torn
                                 }
                                 if (isArms && steps % 5 == 0)
                                 {
-                                    base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 300, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                    pushing = true;
+                                    base.Rectangle = new Rectangle(450, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
                                 }
                                 steps--;
                             }
@@ -277,13 +285,16 @@ namespace Torn
                                 }
                                 if (isArms && steps % 5 == 0)
                                 {
+                                    pushing = false;
                                     base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 300, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
                                 }
                                 steps--;
                             }
                             break;
                         case 'l':
-                            if (hastrench(trench, 'l'))
+                            if (hastrench(trench, 'l') || haswalls(walls, 'l'))
+                                steps = 0;
+                            else if (this.position.X <= MyGlobals.blockSize / 2)
                                 steps = 0;
                             else if (hasObstacle(obstacles, 'l') && !isArms)
                                 steps = 0;
@@ -299,11 +310,12 @@ namespace Torn
                                 }
                                 if (isArms && steps % 5 == 0)
                                 {
-                                    base.Rectangle = new Rectangle((steps % 2)* (int)MyGlobals.realBlockSize + 210, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                    pushing = false;
+                                    base.Rectangle = new Rectangle(420, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
                                 }
                                 steps--;
                             }
-                            else if (hasObstacle(obstacles, 'l') && isArms && obstacleIndex != -1)
+                            else if (hasObstacle(obstacles, 'l') && isArms && obstacleIndex != -1 && !haswalls(walls, 'l'))
                             {
                                 obstacles[obstacleIndex].X -= MyGlobals.blockSize / 10;
                                 this.position.X -= MyGlobals.blockSize / 10;
@@ -313,7 +325,8 @@ namespace Torn
                                 }
                                 if (isArms && steps % 5 == 0)
                                 {
-                                    base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 210, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
+                                    pushing = true;
+                                    base.Rectangle = new Rectangle(390, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
                                 }
                                 steps--;
                             }
@@ -324,9 +337,10 @@ namespace Torn
                                 if (isLegs && steps % 5 == 0)
                                 {
                                     base.Rectangle = new Rectangle((steps % 2) * ((int)MyGlobals.realBlockSize) + 210, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
-                                } 
+                                }
                                 if (isArms && steps % 5 == 0)
                                 {
+                                    pushing = false;
                                     base.Rectangle = new Rectangle((steps % 2) * (int)MyGlobals.realBlockSize + 210, 0, ((int)MyGlobals.realBlockSize), ((int)MyGlobals.realBlockSize));
                                 }
                                 steps--;
@@ -361,25 +375,28 @@ namespace Torn
                         }
                     }
 
-                    if (isArms)
+                    if (isArms && !pushing)
                     {
                         switch (direction)
                         {
                             case 'd':
                                 rectangle = new Rectangle(90, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                                pushing = false;
                                 break;
                             case 'u':
                                 rectangle = new Rectangle(0, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                                pushing = false;
                                 break;
                             case 'l':
                                 rectangle = new Rectangle(180, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                                pushing = false;
                                 break;
                             case 'r':
                                 rectangle = new Rectangle(270, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                                pushing = false;
                                 break;
                         }
                     }
-
                     direction = '-';
                 }
 
@@ -471,6 +488,51 @@ namespace Torn
             return false;
         }
 
+        public bool haswalls(List<Sprite> walls, char direction)
+        {
+            switch (direction)
+            {
+                case 'd':
+                    for (int i = 0; i < walls.Count; i++)
+                    {
+                        if (this.Position.Y + MyGlobals.blockSize == walls[i].Position.Y && this.Position.X == walls[i].Position.X || hasObstacle(obstacles, 'd') && this.Position.Y + 2 * MyGlobals.blockSize == walls[i].Position.Y && this.Position.X == walls[i].Position.X)
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+                case 'u':
+                    for (int i = 0; i < walls.Count; i++)
+                    {
+                        if (this.Position.Y - MyGlobals.blockSize == walls[i].Position.Y && this.Position.X == walls[i].Position.X || this.Position.Y - 2 * MyGlobals.blockSize == walls[i].Position.Y && this.Position.X == walls[i].Position.X && hasObstacle(obstacles, 'u'))
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+                case 'r':
+                    for (int i = 0; i < walls.Count; i++)
+                    {
+                        if (this.Position.X + MyGlobals.blockSize == walls[i].Position.X && this.Position.Y == walls[i].Position.Y || this.Position.X + 2 * MyGlobals.blockSize == walls[i].Position.X && this.Position.Y == walls[i].Position.Y && hasObstacle(obstacles, 'r'))
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+                case 'l':
+                    for (int i = 0; i < walls.Count; i++)
+                    {
+                        if (this.Position.X - MyGlobals.blockSize == walls[i].Position.X && this.Position.Y == walls[i].Position.Y || this.Position.X - 2 * MyGlobals.blockSize == walls[i].Position.X && this.Position.Y == walls[i].Position.Y && hasObstacle(obstacles, 'l'))
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+            }
+
+            return false;
+        }
+
         public bool hasObstacle(List<Sprite> obstacles, char direction)
         {
             int i, j;
@@ -485,7 +547,10 @@ namespace Torn
                             for (j = 0; j < trench.Count; j++)
                             {
                                 if (obstacles[i].Position == trench[j].Position)
+                                {
+                                    obstacles[i].Rectangle = new Rectangle((int)MyGlobals.realBlockSize, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
                                     return false;
+                                }
                             }
                             for (j = 0; j < obstacles.Count; j++)
                             {
@@ -509,7 +574,10 @@ namespace Torn
                             for (j = 0; j < trench.Count; j++)
                             {
                                 if (obstacles[i].Position == trench[j].Position)
+                                {
+                                    obstacles[i].Rectangle = new Rectangle((int)MyGlobals.realBlockSize, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
                                     return false;
+                                }
                             }
                             for (j = 0; j < obstacles.Count; j++)
                             {
@@ -533,7 +601,10 @@ namespace Torn
                             for (j = 0; j < trench.Count; j++)
                             {
                                 if (obstacles[i].Position == trench[j].Position)
+                                {
+                                    obstacles[i].Rectangle = new Rectangle((int)MyGlobals.realBlockSize, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
                                     return false;
+                                }
                             }
                             for (j = 0; j < obstacles.Count; j++)
                             {
@@ -557,7 +628,10 @@ namespace Torn
                             for (j = 0; j < trench.Count; j++)
                             {
                                 if (obstacles[i].Position == trench[j].Position)
+                                {
+                                    obstacles[i].Rectangle = new Rectangle((int)MyGlobals.realBlockSize, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
                                     return false;
+                                }
                             }
                             for (j = 0; j < obstacles.Count; j++)
                             {
@@ -582,6 +656,19 @@ namespace Torn
             keyboard = Keyboard.GetState();
             if (this.isArms || this.isLegs)
             {
+                for (int i = 0; i < walls.Count; i++)
+                {
+                    if (body.Position.Y + MyGlobals.blockSize * 2 == walls[i].Position.Y && body.Position.X == walls[i].Position.X && direction == 'd')
+                        return false;
+                    if (body.Position.Y - MyGlobals.blockSize * 2 == walls[i].Position.Y && body.Position.X == walls[i].Position.X && direction == 'u')
+                        return false;
+                    if (body.Position.X - MyGlobals.blockSize * 2 == walls[i].Position.X && body.Position.Y == walls[i].Position.Y && direction == 'l')
+                        return false;
+                    if (body.Position.X + MyGlobals.blockSize * 2 == walls[i].Position.X && body.Position.Y == walls[i].Position.Y && direction == 'r')
+                        return false;
+                }
+                
+
                 if (this.position.Y + MyGlobals.blockSize == body.Position.Y && this.position.X == body.Position.X && direction == 'd')
                 {
                     for (int i = 0; i < trench.Count; i++)
@@ -678,11 +765,16 @@ namespace Torn
                                     return;
                                 }
                             }
+                            for (i = 0; i < walls.Count; i++)
+                            {
+                                if (this.position.Y + MyGlobals.blockSize * 2 == walls[i].Position.Y && this.position.X == walls[i].Position.X)
+                                    return;
+                            }
                             this.position.Y += MyGlobals.blockSize;
                         }
                         break;
                     case 'u':
-                        if (hastrench(this.trench, 'u') && this.position.Y - MyGlobals.blockSize * 2 > MyGlobals.blockSize/2)
+                        if (hastrench(this.trench, 'u') && this.position.Y - MyGlobals.blockSize * 2 > MyGlobals.blockSize / 2)
                         {
                             for (i = 0; i < trench.Count; i++)
                             {
@@ -699,11 +791,21 @@ namespace Torn
                                     return;
                                 }
                             }
+                            for (i = 0; i < walls.Count; i++)
+                            {
+                                if (this.position.Y - MyGlobals.blockSize * 2 == walls[i].Position.Y && this.position.X == walls[i].Position.X)
+                                    return;
+                            }
                             this.position.Y -= MyGlobals.blockSize;
                         }
                         break;
                     case 'l':
-                        if (hastrench(this.trench, 'l') && this.position.X - MyGlobals.blockSize * 2 > MyGlobals.blockSize/2)
+                        for (i = 0; i < walls.Count; i++)
+                        {
+                            if (this.position.X - MyGlobals.blockSize * 2 == walls[i].Position.X && this.position.Y == walls[i].Position.Y)
+                                return;
+                        }
+                        if (hastrench(this.trench, 'l') && this.position.X - MyGlobals.blockSize * 2 > MyGlobals.blockSize / 2)
                         {
                             for (i = 0; i < trench.Count; i++)
                             {
@@ -720,10 +822,17 @@ namespace Torn
                                     return;
                                 }
                             }
+                            
                             this.position.X -= MyGlobals.blockSize;
                         }
+
                         break;
                     case 'r':
+                        for (i = 0; i < walls.Count; i++)
+                        {
+                            if (this.position.X + MyGlobals.blockSize * 2 == walls[i].Position.X && this.position.Y == walls[i].Position.Y)
+                                return;
+                        }
                         if (hastrench(this.trench, 'r') && this.position.X + MyGlobals.blockSize * 2 < MyGlobals.width - MyGlobals.blockSize / 2)
                         {
                             for (i = 0; i < trench.Count; i++)
@@ -741,6 +850,7 @@ namespace Torn
                                     return;
                                 }
                             }
+                            
                             this.position.X += MyGlobals.blockSize;
                         }
                         break;
@@ -755,19 +865,19 @@ namespace Torn
                 switch (direction)
                 {
                     case 'd':
-                        if (!hastrench(trench, 'd') && !hasObstacle(obstacles, 'd') && hasObstacle(obstacles, 'u') && this.position.Y < MyGlobals.heigh - MyGlobals.blockSize - MyGlobals.blockSize / 2)
+                        if (!haswalls(walls, 'd') && !hastrench(trench, 'd') && !hasObstacle(obstacles, 'd') && hasObstacle(obstacles, 'u') && this.position.Y < MyGlobals.heigh - MyGlobals.blockSize - MyGlobals.blockSize / 2)
                             return true;
                         break;
                     case 'u':
-                        if (!hastrench(trench, 'u') && !hasObstacle(obstacles, 'u') && hasObstacle(obstacles, 'd') && this.position.Y > MyGlobals.blockSize + MyGlobals.blockSize / 2)
+                        if (!haswalls(walls, 'u') && !hastrench(trench, 'u') && !hasObstacle(obstacles, 'u') && hasObstacle(obstacles, 'd') && this.position.Y > MyGlobals.blockSize + MyGlobals.blockSize / 2)
                             return true;
                         break;
                     case 'l':
-                        if (!hastrench(trench, 'l') && !hasObstacle(obstacles, 'l') && hasObstacle(obstacles, 'r') && this.position.X > MyGlobals.blockSize + MyGlobals.blockSize / 2)
+                        if (!haswalls(walls, 'l') && !hastrench(trench, 'l') && !hasObstacle(obstacles, 'l') && hasObstacle(obstacles, 'r') && this.position.X > MyGlobals.blockSize + MyGlobals.blockSize / 2)
                             return true;
                         break;
                     case 'r':
-                        if (!hastrench(trench, 'r') && !hasObstacle(obstacles, 'r') && hasObstacle(obstacles, 'l') && this.position.Y < MyGlobals.width - MyGlobals.blockSize - MyGlobals.blockSize / 2)
+                        if (!haswalls(walls, 'r') && !hastrench(trench, 'r') && !hasObstacle(obstacles, 'r') && hasObstacle(obstacles, 'l') && this.position.Y < MyGlobals.width - MyGlobals.blockSize - MyGlobals.blockSize / 2)
                             return true;
                         break;
                 }

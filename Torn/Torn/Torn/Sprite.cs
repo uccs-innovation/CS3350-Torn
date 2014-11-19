@@ -23,6 +23,11 @@ namespace Torn
         protected Random random;
         protected Rectangle rectangle;
 
+        public Color Color
+        {
+            get { return color; }
+            set { color = value; }
+        }
         public Vector2 Position
         {
             get { return position; }
@@ -55,6 +60,7 @@ namespace Torn
             color = Color.White;
             random = new Random();
             rectangle = new Rectangle(0,0,0,0);
+            center2 = new Vector2(MyGlobals.realBlockSize / 2, MyGlobals.realBlockSize / 2);
             LoadContent();
         }
 

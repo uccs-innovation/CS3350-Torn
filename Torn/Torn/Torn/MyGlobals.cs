@@ -7,7 +7,8 @@ namespace Torn
 {
     public static class MyGlobals
     {
-        public static int numberOfBlocks { get; set; }
+        public static int numberOfBlocksX { get; set; }
+        public static int numberOfBlocksY { get; set; }
         public static int width { get; set; }
         public static int heigh { get; set; }
         public static float blockSize { get; set; }
