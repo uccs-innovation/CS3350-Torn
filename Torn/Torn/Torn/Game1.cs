@@ -1055,9 +1055,12 @@ namespace Torn
                     body[0].Bridge = new List<Sprite>();
                     body[0].Indexes = new List<Vector2>();
                     levelNumber++;
-                    didIt.Play();
-                    if (levelNumber == 5)
+                    if (levelNumber > 5)
+                    {
                         this.Exit();
+                    }
+                    didIt.Play();
+                    
                     LoadContent();                    
                 }
 
