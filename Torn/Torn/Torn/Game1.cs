@@ -563,7 +563,7 @@ namespace Torn
                     switch (messageIndex)
                     {
                         case 1:
-                            text.TextContent = "Welcome to Torn. Currently, your body is separated into three pieces. You \ncan alternate between these parts pressing A to select Arms, H to select \nhead and L to select legs.";
+                            text.TextContent = "Welcome to Torn. Currently, your body is separated into three pieces. You \ncan alternate between these parts pressing A to select Arms, H to select \nhead and L to select legs. You can also restart the level pressing R.";
                             if(Components.IndexOf(enter) == -1)    
                                 Components.Add(enter);
                             break;
