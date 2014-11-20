@@ -20,6 +20,7 @@ namespace Torn
         char direction;
         int steps;
         int obstacleIndex;
+        int obstacleIndexLeft, obstacleIndexRight, obstacleIndexUp, obstacleIndexDown; 
         List<Sprite> obstacles;
         List<Sprite> trench;
         List<Sprite> walls;
@@ -155,8 +156,11 @@ namespace Torn
                                 steps = 0;
                             else if (hasObstacle(obstacles, 'd') && !isArms)
                                 steps = 0;
-                            else if (hasObstacle(obstacles, 'd') && isArms && obstacleIndex == -1)
+                            else if (hasObstacle(obstacles, 'd') && isArms && obstacleIndexDown == -1)
+                            {
                                 steps = 0;
+                                obstacleIndexDown = 0;
+                            }
                             else if (pull(obstacles, 'd') && pullingDown)
                             {
                                 if (instance.State == SoundState.Stopped)
@@ -174,7 +178,7 @@ namespace Torn
                                 }
                                 steps--;
                             }
-                            else if (hasObstacle(obstacles, 'd') && isArms && obstacleIndex != -1 && !haswalls(walls, 'd'))
+                            else if (hasObstacle(obstacles, 'd') && isArms && obstacleIndexDown != -1 && !haswalls(walls, 'd'))
                             {
                                 if (instance.State == SoundState.Stopped)
                                     instance.Play();
@@ -213,8 +217,11 @@ namespace Torn
                                 steps = 0;
                             else if (hasObstacle(obstacles, 'u') && !isArms)
                                 steps = 0;
-                            else if (hasObstacle(obstacles, 'u') && isArms && obstacleIndex == -1)
+                            else if (hasObstacle(obstacles, 'u') && isArms && obstacleIndexUp == -1)
+                            {
+                                obstacleIndexUp = 1;
                                 steps = 0;
+                            }
                             else if (pull(obstacles, 'u') && pullingUp)
                             {
                                 if (instance.State == SoundState.Stopped)
@@ -232,7 +239,7 @@ namespace Torn
                                 }
                                 steps--;
                             }
-                            else if (hasObstacle(obstacles, 'u') && isArms && obstacleIndex != -1 && !haswalls(walls, 'u'))
+                            else if (hasObstacle(obstacles, 'u') && isArms && obstacleIndexUp != -1 && !haswalls(walls, 'u'))
                             {
                                 if (instance.State == SoundState.Stopped)
                                     instance.Play();
@@ -272,8 +279,11 @@ namespace Torn
                                 steps = 0;
                             else if (hasObstacle(obstacles, 'r') && !isArms)
                                 steps = 0;
-                            else if (hasObstacle(obstacles, 'r') && isArms && obstacleIndex == -1)
+                            else if (hasObstacle(obstacles, 'r') && isArms && obstacleIndexRight == -1)
+                            {
+                                obstacleIndexRight = 1;
                                 steps = 0;
+                            }
                             else if (pull(obstacles, 'r') && pullingRight)
                             {
                                 if (instance.State == SoundState.Stopped)
@@ -291,7 +301,7 @@ namespace Torn
                                 }
                                 steps--;
                             }
-                            else if (hasObstacle(obstacles, 'r') && isArms && obstacleIndex != -1 && !haswalls(walls, 'r'))
+                            else if (hasObstacle(obstacles, 'r') && isArms && obstacleIndexRight != -1 && !haswalls(walls, 'r'))
                             {
                                 if (instance.State == SoundState.Stopped)
                                     instance.Play();
@@ -330,8 +340,11 @@ namespace Torn
                                 steps = 0;
                             else if (hasObstacle(obstacles, 'l') && !isArms)
                                 steps = 0;
-                            else if (hasObstacle(obstacles, 'l') && isArms && obstacleIndex == -1)
+                            else if (hasObstacle(obstacles, 'l') && isArms && obstacleIndexLeft == -1)
+                            {
+                                obstacleIndexLeft = 1;
                                 steps = 0;
+                            }
                             else if (pull(obstacles, 'l') && pullingLeft)
                             {
                                 if (instance.State == SoundState.Stopped)
@@ -349,7 +362,7 @@ namespace Torn
                                 }
                                 steps--;
                             }
-                            else if (hasObstacle(obstacles, 'l') && isArms && obstacleIndex != -1 && !haswalls(walls, 'l'))
+                            else if (hasObstacle(obstacles, 'l') && isArms && obstacleIndexLeft != -1 && !haswalls(walls, 'l'))
                             {
                                 if (instance.State == SoundState.Stopped)
                                     instance.Play();
@@ -641,7 +654,7 @@ namespace Torn
                                 if (!pullingUp && (obstacles[i].Position.Y + MyGlobals.blockSize == obstacles[j].Position.Y && obstacles[i].Position.X == obstacles[j].Position.X || obstacles[i].Position.Y>= MyGlobals.heigh - MyGlobals.blockSize - MyGlobals.blockSize/2))
                                 {
                                     //Return -1 to indicate that there is a double obstacle line.
-                                    obstacleIndex = -1;
+                                    obstacleIndexDown = -1;
                                     return true;
                                 }
                             }
@@ -668,7 +681,7 @@ namespace Torn
                                 if (!pullingDown && (obstacles[i].Position.Y - MyGlobals.blockSize == obstacles[j].Position.Y && obstacles[i].Position.X == obstacles[j].Position.X || obstacles[i].Position.Y <= MyGlobals.blockSize + MyGlobals.blockSize/2))
                                 {
                                     //Return -1 to indicate that there is a double obstacle line.
-                                    obstacleIndex = -1;
+                                    obstacleIndexUp = -1;
                                     return true;
                                 }
                             }
@@ -695,7 +708,7 @@ namespace Torn
                                 if (!pullingLeft && (obstacles[i].Position.X + MyGlobals.blockSize == obstacles[j].Position.X && obstacles[i].Position.Y == obstacles[j].Position.Y || obstacles[i].Position.X >= MyGlobals.width - MyGlobals.blockSize - MyGlobals.blockSize / 2))
                                 {
                                     //Return -1 to indicate that there is a double obstacle line.
-                                    obstacleIndex = -1;
+                                    obstacleIndexRight = -1;
                                     return true;
                                 }
                             }
@@ -722,7 +735,7 @@ namespace Torn
                                 if (!pullingRight && (obstacles[i].Position.X - MyGlobals.blockSize == obstacles[j].Position.X && obstacles[i].Position.Y == obstacles[j].Position.Y || obstacles[i].Position.X <= MyGlobals.blockSize + MyGlobals.blockSize / 2))
                                 {
                                     //Return -1 to indicate that there is a double obstacle line.
-                                    obstacleIndex = -1;
+                                    obstacleIndexLeft = -1;
                                     return true;
                                 }
                             }
@@ -949,19 +962,19 @@ namespace Torn
                 switch (direction)
                 {
                     case 'd':
-                        if (!haswalls(walls, 'd') && !hastrench(trench, 'd') && !hasObstacle(obstacles, 'd') && hasObstacle(obstacles, 'u') && this.position.Y < MyGlobals.heigh - MyGlobals.blockSize - MyGlobals.blockSize / 2)
+                        if (!haswalls(walls, 'd') && !hastrench(trench, 'd') && !hasObstacle(obstacles, 'd') && hasObstacle(obstacles, 'u') && this.position.Y < MyGlobals.heigh - MyGlobals.blockSize / 2)
                             return true;
                         break;
                     case 'u':
-                        if (!haswalls(walls, 'u') && !hastrench(trench, 'u') && !hasObstacle(obstacles, 'u') && hasObstacle(obstacles, 'd') && this.position.Y > MyGlobals.blockSize + MyGlobals.blockSize / 2)
+                        if (!haswalls(walls, 'u') && !hastrench(trench, 'u') && !hasObstacle(obstacles, 'u') && hasObstacle(obstacles, 'd') && this.position.Y > MyGlobals.blockSize / 2)
                             return true;
                         break;
                     case 'l':
-                        if (!haswalls(walls, 'l') && !hastrench(trench, 'l') && !hasObstacle(obstacles, 'l') && hasObstacle(obstacles, 'r') && this.position.X > MyGlobals.blockSize + MyGlobals.blockSize / 2)
+                        if (!haswalls(walls, 'l') && !hastrench(trench, 'l') && !hasObstacle(obstacles, 'l') && hasObstacle(obstacles, 'r') && this.position.X >  MyGlobals.blockSize / 2)
                             return true;
                         break;
                     case 'r':
-                        if (!haswalls(walls, 'r') && !hastrench(trench, 'r') && !hasObstacle(obstacles, 'r') && hasObstacle(obstacles, 'l') && this.position.Y < MyGlobals.width - MyGlobals.blockSize - MyGlobals.blockSize / 2)
+                        if (!haswalls(walls, 'r') && !hastrench(trench, 'r') && !hasObstacle(obstacles, 'r') && hasObstacle(obstacles, 'l') && this.position.Y < MyGlobals.width - MyGlobals.blockSize / 2)
                             return true;
                         break;
                 }
