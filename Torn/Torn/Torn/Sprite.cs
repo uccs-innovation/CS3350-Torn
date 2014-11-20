@@ -22,7 +22,14 @@ namespace Torn
         protected Color color;
         protected Random random;
         protected Rectangle rectangle;
+        protected float layerDepth;
+        protected List<Vector2> equivalentBridges; 
 
+        public List<Vector2>EquivBridges
+        {
+            get { return equivalentBridges; }
+            set { equivalentBridges = value; }
+        }
         public Color Color
         {
             get { return color; }
@@ -51,6 +58,12 @@ namespace Torn
             get { return rectangle; }
             set { rectangle = value; }
         }
+        
+        public float LayerDepth
+        {
+            get { return layerDepth; }
+            set { layerDepth = value; }
+        }
 
         public Sprite(Game game, String textureFile, Vector2 position)
             : base(game)
@@ -61,6 +74,8 @@ namespace Torn
             random = new Random();
             rectangle = new Rectangle(0,0,0,0);
             center2 = new Vector2(MyGlobals.realBlockSize / 2, MyGlobals.realBlockSize / 2);
+            layerDepth = 1f;
+            equivalentBridges = new List<Vector2>();
             LoadContent();
         }
 
@@ -87,9 +102,9 @@ namespace Torn
 
             sb.Begin();
             if(rectangle.Equals(new Rectangle(0,0,0,0)))
-                sb.Draw(texture, position, null, color, 0f, center, MyGlobals.scale, SpriteEffects.None, 0f);
+                sb.Draw(texture, position, null, color, 0f, center, MyGlobals.scale, SpriteEffects.None, layerDepth);
             else
-                sb.Draw(texture, position, rectangle, color, 0f, center2, MyGlobals.scale, SpriteEffects.None, 0f);
+                sb.Draw(texture, position, rectangle, color, 0f, center2, MyGlobals.scale, SpriteEffects.None, layerDepth);
             sb.End();
             
 

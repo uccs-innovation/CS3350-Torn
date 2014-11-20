@@ -32,25 +32,37 @@ namespace Torn
         List<Sprite> brokenBridges;
         List<Sprite> grasses;
         List<Sprite> walls;
+        List<Sprite> plates;
+        List<Sprite> bridges;
         int[] finished;
-        Sprite levelEnd, aux, textBox;
+        Sprite aux, textBox;
         List<Vector2> indexesBellow, indexesRight, indexesLeft, indexesAbove;
         List<Sprite> hiddenAbove, hiddenBellow, hiddenRight, hiddenLeft;
-        SoundEffect ambientSound;
-        SoundEffectInstance instance;
+        Song ambientSound;
+        SoundEffect kick, nice, pressurePlateOn, thrownHead, didIt;
         Text text;
         String tutorial;
         int countBellow, countAbove, countLeft, countRight, messageIndex;
         KeyboardState old;
-        int levelNumber, levelAux;
+        int levelNumber, levelAux, bridgesNumber;
         Sprite enter;
+        float counter;
+        List<Sprite> bridgeOn, bridgeOff;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             //graphics.IsFullScreen = true;
-            
+
+            ambientSound = Content.Load<Song>(@"Sounds\ambientSound");
+            MediaPlayer.Play(ambientSound);
+            MediaPlayer.IsRepeating = true;
+
+
+
+            counter = 300;
+
             //Initialize all the global variables
             MyGlobals.width = 480 * 2;
             MyGlobals.heigh = 420 * 2;
@@ -81,6 +93,7 @@ namespace Torn
             messageIndex = 0;
             levelNumber = 1;
             levelAux = levelNumber;
+            bridgesNumber = 0;
             
             body = new UserControlledSprite[3];
             started = false;
@@ -93,6 +106,10 @@ namespace Torn
             brokenBridges = new List<Sprite>();
             blockSight = new List<Vector2>();
             walls = new List<Sprite>();
+            plates = new List<Sprite>();
+            bridges = new List<Sprite>();
+            bridgeOn = new List<Sprite>();
+            bridgeOff = new List<Sprite>();
 
             indexesAbove = new List<Vector2>();
             indexesBellow = new List<Vector2>();
@@ -109,11 +126,6 @@ namespace Torn
 
             old = new KeyboardState();
 
-            ambientSound = Content.Load<SoundEffect>(@"Sounds\music");
-            instance = ambientSound.CreateInstance();
-            instance.IsLooped = true;
-            ambientSound.Play();
-
         }
         protected override void Initialize()
         {
@@ -124,18 +136,46 @@ namespace Torn
         public void readField(String levelName)
         {
             string line;
-            int i = 0, j = 0, lastJ = 0, lastI = 0, result = 0, rest = 0;
+            int i = 0, j = 0, k = 0, lastJ = 0, lastI = 0, result = 0, rest = 0;
 
             System.IO.StreamReader file = new System.IO.StreamReader(@"Levels\level"+levelName+".txt");
+
             while ((line = file.ReadLine()) != null)
             {
-                while (j * 2 < line.Length)
+                while (k < line.Length)
                 {
-                    field[i, j] = Int32.Parse(line[j * 2].ToString());
-                    j++;
+                    if (k == line.Length)
+                    {
+                        field[i, j] = int.Parse(line[k].ToString());
+                        j++;
+                        k++;
+                    }
+                    else if(k < line.Length - 1 && line[k+1] == ' ')
+                    {
+                        field[i, j] = int.Parse(line[k].ToString());
+                        j++;
+                        k++;
+                    }
+                    else if(k == line.Length - 1)
+                    {
+                        field[i, j] = int.Parse(line[k].ToString());
+                        j++;
+                        k++;
+                    }
+                    else if(line[k] == ' ')
+                    {
+                        k++;
+                    }
+                    else
+                    {
+                        field[i, j] = int.Parse(line[k].ToString() + line[k + 1].ToString());
+                        j++;
+                        k = k + 2;
+                    }
                 }
                 lastJ = j;
                 j = 0;
+                k = 0;
                 i++;
             }
 
@@ -221,13 +261,20 @@ namespace Torn
             
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            readField(levelNumber.ToString());
+            
 
+            readField(levelNumber.ToString());
             highlightedGrass = new Sprite(this, @"Images\highlightedGrass", new Vector2(0, 0));
             grasses = new List<Sprite>();
 
             if (!started)
             {
+                kick = Content.Load<SoundEffect>(@"Sounds\Kick");
+                nice = Content.Load<SoundEffect>(@"Sounds\Nice");
+                pressurePlateOn = Content.Load<SoundEffect>(@"Sounds\PressurePlateOn");
+                thrownHead = Content.Load<SoundEffect>(@"Sounds\ThrownHead");
+                didIt = Content.Load<SoundEffect>(@"Sounds\didIt");
+
                 initialPosition.X = graphics.PreferredBackBufferWidth / 2;
                 initialPosition.Y = graphics.PreferredBackBufferHeight / 2;
                 initialScreen = new Sprite(this, @"Images\InitialScreen", initialPosition);
@@ -235,14 +282,22 @@ namespace Torn
             }
             else if(levelFinished())
             {
+                for (int i = Components.Count -1; i > 0 ; i--)
+                {
+                    Components.RemoveAt(i);
+                }
+
                 trench = new List<Sprite>();
                 obstacles = new List<Sprite>();
-                bridgePlates = new List<BridgePlate>();
                 bridgesPosition = new List<Vector2>();
                 platesPosition = new List<Vector2>();
                 brokenBridges = new List<Sprite>();
                 blockSight = new List<Vector2>();
                 walls = new List<Sprite>();
+                plates = new List<Sprite>();
+                bridges = new List<Sprite>();
+                bridgeOn = new List<Sprite>();
+                grasses = new List<Sprite>();
 
                 indexesAbove = new List<Vector2>();
                 indexesBellow = new List<Vector2>();
@@ -254,10 +309,7 @@ namespace Torn
                 hiddenLeft = new List<Sprite>();
                 hiddenRight = new List<Sprite>();
 
-                initialPosition.X = graphics.PreferredBackBufferWidth / 2;
-                initialPosition.Y = graphics.PreferredBackBufferHeight / 2;
-                levelEnd = new Sprite(this, @"Images\levelEnd1", initialPosition);
-                Components.Add(levelEnd);
+
                 finished[0] = 0;
                 finished[1] = 0;
                 finished[2] = 0;
@@ -291,7 +343,6 @@ namespace Torn
                             initialPosition.Y = (i + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
                             aux = new Sprite(this, @"Images\edge", initialPosition);
                             Components.Add(aux);
-                            //trench.Add(aux);
                             walls.Add(aux);
                         }
                     }
@@ -301,40 +352,61 @@ namespace Torn
                 {
                     for (int j = 0; j < MyGlobals.numberOfBlocksX; j++)
                     {
-                        if (field[i, j] == MyGlobals.plates)
+                        if (field[i, j] > MyGlobals.plates * 10 && field[i, j] / 10 == MyGlobals.plates)
                         {
                             initialPosition.X = (j + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
                             initialPosition.Y = (i + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
-                            platesPosition.Add(initialPosition);
+                            aux = new Sprite(this, @"Images\pressureplate_grass", initialPosition);
+                            
+                            for (int k = 0; k < MyGlobals.numberOfBlocksY; k++)
+                            {
+                                for (int l = 0; l < MyGlobals.numberOfBlocksX; l++)
+                                {
+                                    if (field[k, l] / 10 == MyGlobals.bridges && field[k, l] % 10 == field[i, j] % 10)
+                                    {
+                                        initialPosition.X = (l + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
+                                        initialPosition.Y = (k + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
+                                        aux.EquivBridges.Add(initialPosition);
+                                    }
+                                }
+                            }
+                            plates.Add(aux);
+                        }
+                        else if (field[i, j] == MyGlobals.plates)
+                        {
+                            initialPosition.X = (j + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
+                            initialPosition.Y = (i + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
+                            aux = new Sprite(this, @"Images\pressureplate_grass", initialPosition);
+                            for (int k = 0; k < MyGlobals.numberOfBlocksY; k++)
+                            {
+                                for (int l = 0; l < MyGlobals.numberOfBlocksX; l++)
+                                {
+                                    if (field[k, l] / 10 == MyGlobals.bridges)
+                                    {
+                                        initialPosition.X = (l + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
+                                        initialPosition.Y = (k + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
+                                        aux.EquivBridges.Add(initialPosition);
+                                    }
+                                }
+                            }
+                            plates.Add(aux);
                         }
                     }
                 }
 
-                for (int i = 0; i < MyGlobals.numberOfBlocksY; i++)
+                for (int i = 0; i < plates.Count; i++)
                 {
-                    for (int j = 0; j < MyGlobals.numberOfBlocksX; j++)
+                    for (int j = 0; j < plates[i].EquivBridges.Count; j++)
                     {
-                        if (field[i, j] == MyGlobals.bridges)
-                        {
-                            initialPosition.X = (j + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
-                            initialPosition.Y = (i + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
-                            bridgesPosition.Add(initialPosition);
-                            brokenBridges.Add(new Sprite(this, @"Images\bridge", initialPosition));
-                        }
+                        aux = new Sprite(this, @"Images\bridge", plates[i].EquivBridges[j]);
+                        aux.Rectangle = new Rectangle(0, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                        walls.Add(aux);
+                        bridges.Add(aux); 
+                        Components.Add(aux);
                     }
+                    Components.Add(plates[i]);
                 }
 
-                for (int i = 0; i < brokenBridges.Count; i++)
-                {
-                    walls.Add(brokenBridges[i]);
-                }
-
-                for (int i = 0; i < bridgesPosition.Count; i++)
-                {
-                    bridgePlates.Add(new BridgePlate(this, @"Images\bridge", bridgesPosition[i], @"Images\pressureplate_grass", platesPosition[i]));
-                    Components.Add(bridgePlates[i]);
-                }
-                
                 for (int i = 0; i < MyGlobals.numberOfBlocksY; i++)
                 {
                     for (int j = 0; j < MyGlobals.numberOfBlocksX; j++)
@@ -429,21 +501,19 @@ namespace Torn
                 body[1].Walls = walls;
                 body[2].Walls = walls;
 
-                body[0].Trench.Add(body[1]);
-                body[0].Trench.Add(body[2]);
+                body[0].Walls.Add(body[1]);
+                body[0].Walls.Add(body[2]);
 
-                body[1].Trench.Add(body[0]);
-                body[1].Trench.Add(body[2]);
+                body[1].Walls.Add(body[0]);
+                body[1].Walls.Add(body[2]);
 
-                body[2].Trench.Add(body[0]);
-                body[2].Trench.Add(body[1]);
+                body[2].Walls.Add(body[0]);
+                body[2].Walls.Add(body[1]);
 
 
                 body[1].Obstacles = obstacles;
 
                 //Components.Add(blindness);
-
-
                 //TUTORIAL
                 if(levelNumber == 1)
                 {
@@ -469,8 +539,6 @@ namespace Torn
 
             keyboard = Keyboard.GetState();
 
-           
-
             //Waits for the first ENTER to initialize the game
             if (keyboard.IsKeyDown(Keys.Enter) && !started)
             {
@@ -484,7 +552,7 @@ namespace Torn
                 body[0].Obstacles = body[1].Obstacles;
                 body[2].Obstacles = body[1].Obstacles;
 
-                
+                counter -= gameTime.ElapsedGameTime.Seconds;
             }
 
             //Tutorial
@@ -616,30 +684,54 @@ namespace Torn
                 if (keyboard.IsKeyDown(Keys.LeftShift) && keyboard.IsKeyDown(Keys.Down))
                 {
                     if (body[2].kick(body[0], 'd'))
+                    {
                         body[0].Position = new Vector2(body[0].Position.X, body[0].Position.Y + MyGlobals.blockSize * 2);
+                        thrownHead.Play();
+                    }
                     else if (body[2].kick(body[1], 'd'))
+                    {
                         body[1].Position = new Vector2(body[1].Position.X, body[1].Position.Y + MyGlobals.blockSize * 2);
+                            kick.Play();
+                    }
                 }
                 else if (keyboard.IsKeyDown(Keys.LeftShift) && keyboard.IsKeyDown(Keys.Up))
                 {
                     if (body[2].kick(body[0], 'u'))
+                    {
                         body[0].Position = new Vector2(body[0].Position.X, body[0].Position.Y - MyGlobals.blockSize * 2);
+                        thrownHead.Play();
+                    }
                     else if (body[2].kick(body[1], 'u'))
+                    {
                         body[1].Position = new Vector2(body[1].Position.X, body[1].Position.Y - MyGlobals.blockSize * 2);
+                        kick.Play();
+                    }
                 }
                 else if (keyboard.IsKeyDown(Keys.LeftShift) && keyboard.IsKeyDown(Keys.Left))
                 {
                     if (body[2].kick(body[0], 'l'))
+                    {
                         body[0].Position = new Vector2(body[0].Position.X - MyGlobals.blockSize * 2, body[0].Position.Y);
+                        thrownHead.Play();
+                    }
                     else if (body[2].kick(body[1], 'l'))
+                    {
                         body[1].Position = new Vector2(body[1].Position.X - MyGlobals.blockSize * 2, body[1].Position.Y);
+                        kick.Play();
+                    }
                 }
                 else if (keyboard.IsKeyDown(Keys.LeftShift) && keyboard.IsKeyDown(Keys.Right))
                 {
                     if (body[2].kick(body[0], 'r'))
+                    {
                         body[0].Position = new Vector2(body[0].Position.X + MyGlobals.blockSize * 2, body[0].Position.Y);
+                        thrownHead.Play();
+                    }
                     else if (body[2].kick(body[1], 'r'))
+                    {
                         body[1].Position = new Vector2(body[1].Position.X + MyGlobals.blockSize * 2, body[1].Position.Y);
+                        kick.Play();
+                    }
                 }
 
                 if (body[0].Position.X > graphics.PreferredBackBufferWidth - MyGlobals.blockSize)
@@ -668,28 +760,40 @@ namespace Torn
                 if (keyboard.IsKeyDown(Keys.LeftShift) && keyboard.IsKeyDown(Keys.Down))
                 {
                     if (body[1].kick(body[0], 'd'))
+                    {
                         body[0].Position = new Vector2(body[0].Position.X, body[0].Position.Y + MyGlobals.blockSize * 2);
+                        thrownHead.Play();
+                    }
                     else if (body[1].kick(body[2], 'd'))
                         body[2].Position = new Vector2(body[2].Position.X, body[2].Position.Y + MyGlobals.blockSize * 2);
                 }
                 else if (keyboard.IsKeyDown(Keys.LeftShift) && keyboard.IsKeyDown(Keys.Up))
                 {
                     if (body[1].kick(body[0], 'u'))
+                    {
                         body[0].Position = new Vector2(body[0].Position.X, body[0].Position.Y - MyGlobals.blockSize * 2);
+                        thrownHead.Play();
+                    }
                     else if (body[1].kick(body[2], 'u'))
                         body[2].Position = new Vector2(body[2].Position.X, body[2].Position.Y - MyGlobals.blockSize * 2);
                 }
                 else if (keyboard.IsKeyDown(Keys.LeftShift) && keyboard.IsKeyDown(Keys.Left))
                 {
                     if (body[1].kick(body[0], 'l'))
+                    {
                         body[0].Position = new Vector2(body[0].Position.X - MyGlobals.blockSize * 2, body[0].Position.Y);
+                        thrownHead.Play();
+                    }
                     else if (body[1].kick(body[2], 'l'))
                         body[2].Position = new Vector2(body[2].Position.X - MyGlobals.blockSize * 2, body[2].Position.Y);
                 }
                 else if (keyboard.IsKeyDown(Keys.LeftShift) && keyboard.IsKeyDown(Keys.Right))
                 {
                     if (body[1].kick(body[0], 'r'))
+                    {
                         body[0].Position = new Vector2(body[0].Position.X + MyGlobals.blockSize * 2, body[0].Position.Y);
+                        thrownHead.Play();
+                    }
                     else if (body[1].kick(body[2], 'r'))
                         body[2].Position = new Vector2(body[2].Position.X + MyGlobals.blockSize * 2, body[2].Position.Y);
                 }
@@ -898,52 +1002,115 @@ namespace Torn
                 if(finalized(body[0].Position))
                 {
                     Components.Remove(body[0]);
-                    body[1].Trench.Remove(body[0]);
-                    body[2].Trench.Remove(body[0]);
+                    body[1].Walls.Remove(body[0]);
+                    body[2].Walls.Remove(body[0]);
                     finished[0] = 1;
                 }
                 if (finalized(body[1].Position))
                 {
                     Components.Remove(body[1]);
-                    body[0].Trench.Remove(body[1]);
-                    body[2].Trench.Remove(body[1]);
+                    body[0].Walls.Remove(body[1]);
+                    body[2].Walls.Remove(body[1]);
                     finished[1] = 1;
                 }
                 if (finalized(body[2].Position))
                 {
                     Components.Remove(body[2]);
-                    body[0].Trench.Remove(body[2]);
-                    body[1].Trench.Remove(body[2]);
+                    body[0].Walls.Remove(body[2]);
+                    body[1].Walls.Remove(body[2]);
                     finished[2] = 1;
+                }
+
+                if(started && keyboard.IsKeyDown(Keys.R))
+                {
+
+                    body[1].Walls.Remove(body[0]);
+                    body[2].Walls.Remove(body[0]);
+                    finished[0] = 1;
+
+                    Components.Remove(body[1]);
+                    body[0].Walls.Remove(body[1]);
+                    body[2].Walls.Remove(body[1]);
+                    finished[1] = 1;
+
+                    Components.Remove(body[2]);
+                    body[0].Walls.Remove(body[2]);
+                    body[1].Walls.Remove(body[2]);
+                    finished[2] = 1;
+
+
+                    body[0].Obstacles = new List<Sprite>();
+                    body[0].Trench = new List<Sprite>();
+                    body[0].Walls = new List<Sprite>();
+                    body[0].Bridge = new List<Sprite>();
+                    body[0].Indexes = new List<Vector2>();
+                    LoadContent();
                 }
 
                 if(levelFinished())
                 {
+                    body[0].Obstacles = new List<Sprite>();
+                    body[0].Trench = new List<Sprite>();
+                    body[0].Walls = new List<Sprite>();
+                    body[0].Bridge = new List<Sprite>();
+                    body[0].Indexes = new List<Vector2>();
                     levelNumber++;
-                    LoadContent();
-                    if (levelNumber == 4)
+                    didIt.Play();
+                    if (levelNumber == 5)
                         this.Exit();
-                    
+                    LoadContent();                    
                 }
 
-               for (int i = 0; i < bridgePlates.Count; i++)
-               {
-                   if (bridgePlates[i].isPlatePressed(body[0].Position) || bridgePlates[i].isPlatePressed(body[1].Position) || bridgePlates[i].isPlatePressed(body[2].Position))
-                   {
-                       walls.Remove(brokenBridges[i]);
-                   }
-                   else if (walls.IndexOf(brokenBridges[i]) == -1)
-                   {
-                       walls.Add(brokenBridges[i]);
-                   }
-               }
+                List<Vector2> auxList = platePressed();
 
-               if (started)
-               {
-                   body[0].Walls = walls;
-                   body[1].Walls = walls;
-                   body[2].Walls = walls;
-               }
+                if (auxList.Count >= bridgesNumber)
+                {
+                    for (int i = 0; i < auxList.Count; i++)
+                    {
+                        for (int j = 0; j < bridges.Count; j++)
+                        {
+                            if(auxList[i] == bridges[j].Position)
+                            {
+                                bridges[j].Rectangle = new Rectangle((int)MyGlobals.realBlockSize, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                            }
+                        }
+                    }
+                    for (int i = 0; i < auxList.Count; i++)
+                    {
+                        for (int j = 0; j < walls.Count; j++)
+                        {
+                            if (walls[j].Position == auxList[i])
+                            {
+                                bridgeOn.Add(walls[j]);
+                                walls.RemoveAt(j);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < bridges.Count; i++)
+                    {
+                        bridges[i].Rectangle = new Rectangle(0, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                    }
+                    for (int i = 0; i < bridgeOn.Count; i++)
+                    {
+                        walls.Add(bridgeOn[i]);
+                    }
+                    bridgeOn = new List<Sprite>();
+                }
+
+                bridgesNumber = auxList.Count;
+                if (started)
+                {
+                    body[0].Walls = walls;
+                    body[1].Walls = walls;
+                    body[2].Walls = walls;
+
+                    body[0].Bridge = bridges;
+                    body[1].Bridge = bridges;
+                    body[2].Bridge = bridges;
+                }
             }
 
             
@@ -981,6 +1148,19 @@ namespace Torn
             }
             
             return false;
+        }
+        public List<Vector2> platePressed()
+        {
+            List<Vector2> temp = new List<Vector2>();
+            for (int i = 0; i < plates.Count; i++)
+            {
+                if(plates[i].Position == body[0].Position || plates[i].Position == body[1].Position || plates[i].Position == body[2].Position)
+                {
+                    temp.AddRange(plates[i].EquivBridges);
+                }
+            }
+
+            return temp;
         }
     }
 }

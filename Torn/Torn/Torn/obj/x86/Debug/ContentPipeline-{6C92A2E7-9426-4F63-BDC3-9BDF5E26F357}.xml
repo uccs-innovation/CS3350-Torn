@@ -8,7 +8,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\InitialScreen.xnb</Output>
-      <Time>2014-10-16T11:16:36.6277407-06:00</Time>
+      <Time>2014-11-20T01:50:55.3425805-07:00</Time>
     </Item>
     <Item>
       <Source>Images\Arms.png</Source>
@@ -74,22 +74,13 @@
       <Time>2014-10-29T16:22:42.725269-06:00</Time>
     </Item>
     <Item>
-      <Source>Images\levelEnd1.png</Source>
-      <Name>Images\levelEnd1</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\levelEnd1.xnb</Output>
-      <Time>2014-10-16T13:51:25.3013697-06:00</Time>
-    </Item>
-    <Item>
       <Source>Images\bridge.png</Source>
       <Name>Images\bridge</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\bridge.xnb</Output>
-      <Time>2014-11-16T16:32:47.2457665-07:00</Time>
+      <Time>2014-11-19T23:38:41.8463733-07:00</Time>
     </Item>
     <Item>
       <Source>Images\filledpit.png</Source>
@@ -119,15 +110,6 @@
       <Time>2014-11-12T12:06:54-07:00</Time>
     </Item>
     <Item>
-      <Source>Images\pressureplate.png</Source>
-      <Name>Images\pressureplate</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\pressureplate.xnb</Output>
-      <Time>2014-10-29T16:23:25.5547031-06:00</Time>
-    </Item>
-    <Item>
       <Source>Images\pressureplate_grass.png</Source>
       <Name>Images\pressureplate_grass</Name>
       <Importer>TextureImporter</Importer>
@@ -143,7 +125,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\BlockVision.xnb</Output>
-      <Time>2014-10-29T21:40:19.6001793-06:00</Time>
+      <Time>2014-11-20T02:48:47.2764995-07:00</Time>
     </Item>
     <Item>
       <Source>Images\blankBox.png</Source>
@@ -164,15 +146,6 @@
       <Time>2014-09-15T23:21:34.4872373-06:00</Time>
     </Item>
     <Item>
-      <Source>Sounds\music.wav</Source>
-      <Name>Sounds\music</Name>
-      <Importer>WavImporter</Importer>
-      <Processor>SoundEffectProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Sounds\music.xnb</Output>
-      <Time>2014-11-13T14:34:12.6518485-07:00</Time>
-    </Item>
-    <Item>
       <Source>Images\highlightedGrass.png</Source>
       <Name>Images\highlightedGrass</Name>
       <Importer>TextureImporter</Importer>
@@ -189,6 +162,70 @@
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Images\enter.xnb</Output>
       <Time>2014-11-18T20:49:17.9634003-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Sounds\ambientSound.mp3</Source>
+      <Name>Sounds\ambientSound</Name>
+      <Importer>Mp3Importer</Importer>
+      <Processor>SongProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Sounds\ambientSound.xnb</Output>
+      <Extra>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Sounds\ambientSound.wma</Extra>
+      <Time>2014-11-03T07:06:48-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Sounds\Kick.wav</Source>
+      <Name>Sounds\Kick</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Sounds\Kick.xnb</Output>
+      <Time>2014-11-20T10:11:56-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Sounds\MovingBox.wav</Source>
+      <Name>Sounds\MovingBox</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Sounds\MovingBox.xnb</Output>
+      <Time>2014-11-20T10:11:56-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Sounds\Nice.wav</Source>
+      <Name>Sounds\Nice</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Sounds\Nice.xnb</Output>
+      <Time>2014-11-20T10:11:56-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Sounds\PressurePlateOn.wav</Source>
+      <Name>Sounds\PressurePlateOn</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Sounds\PressurePlateOn.xnb</Output>
+      <Time>2014-11-20T10:11:56-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Sounds\ThrownHead.wav</Source>
+      <Name>Sounds\ThrownHead</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Sounds\ThrownHead.xnb</Output>
+      <Time>2014-11-20T10:11:56-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Sounds\didIt.wav</Source>
+      <Name>Sounds\didIt</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Debug\Content\Sounds\didIt.xnb</Output>
+      <Time>2014-11-20T02:41:26.4513581-07:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

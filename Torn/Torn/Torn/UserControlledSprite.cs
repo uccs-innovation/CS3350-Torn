@@ -16,14 +16,17 @@ namespace Torn
     class UserControlledSprite : Sprite
     {
         KeyboardState keyboard;
-        bool update, moving, isArms, isLegs, isVisible, pulling, stoped, pushing;
+        bool update, moving, isArms, isLegs, isVisible, pullingDown, pullingUp, pullingRight, pullingLeft, stoped, pushing;
         char direction;
         int steps;
         int obstacleIndex;
         List<Sprite> obstacles;
         List<Sprite> trench;
         List<Sprite> walls;
+        List<Sprite> bridges;
         List<Vector2> indexes;
+        SoundEffect movingBox;
+        SoundEffectInstance instance;
 
         public UserControlledSprite(Game game, String textureFile, Vector2 position, bool isArms, bool isLegs)
             : base(game, textureFile, position)
@@ -31,7 +34,10 @@ namespace Torn
             //Initializes all the attributes with false in order to control the execution of the program
             update = false;
             moving = false;
-            pulling = false;
+            pullingDown = false;
+            pullingLeft = false;
+            pullingUp = false;
+            pullingRight = false;
             stoped = true;
             //Attribute to control how many steps the body part will walk during each interaction
             steps = MyGlobals.steps;
@@ -39,7 +45,11 @@ namespace Torn
             this.isLegs = isLegs;
             isVisible = true;
             pushing = false;
-           
+
+
+            movingBox = Game.Content.Load<SoundEffect>(@"Sounds\MovingBox");
+            instance = movingBox.CreateInstance();
+
             if(isLegs)
             {
                 rectangle = new Rectangle(0, 0, (int) MyGlobals.realBlockSize, (int) MyGlobals.realBlockSize);
@@ -54,6 +64,16 @@ namespace Torn
         {
             get { return walls; }
             set { walls = value; }
+        }
+        public List<Sprite> Bridge
+        {
+            get { return bridges; }
+            set { bridges = value; }
+        }
+        public List<Vector2> Indexes
+        {
+            get { return indexes; }
+            set { indexes = value; }
         }
 
         public bool IsVisible
@@ -92,7 +112,7 @@ namespace Torn
                 if (keyboard.IsKeyDown(Keys.Down) && !moving) 
                 {
                     if (keyboard.IsKeyDown(Keys.LeftShift))
-                        pulling = true;
+                        pullingDown = true;
                     direction = 'd';
                     moving = true;
                     stoped = true;
@@ -100,7 +120,7 @@ namespace Torn
                 else if (keyboard.IsKeyDown(Keys.Up) && !moving)
                 {
                     if (keyboard.IsKeyDown(Keys.LeftShift))
-                        pulling = true;
+                        pullingUp = true;
                     direction = 'u';
                     moving = true;
                     stoped = true;
@@ -108,7 +128,7 @@ namespace Torn
                 else if (keyboard.IsKeyDown(Keys.Left) && !moving)
                 {
                     if (keyboard.IsKeyDown(Keys.LeftShift))
-                        pulling = true;
+                        pullingLeft = true;
                     direction = 'l';
                     moving = true;
                     stoped = true;
@@ -116,7 +136,7 @@ namespace Torn
                 else if (keyboard.IsKeyDown(Keys.Right) && !moving) 
                 {
                     if (keyboard.IsKeyDown(Keys.LeftShift))
-                        pulling = true;
+                        pullingRight = true;
                     direction = 'r';
                     moving = true;
                     stoped = true;
@@ -137,8 +157,10 @@ namespace Torn
                                 steps = 0;
                             else if (hasObstacle(obstacles, 'd') && isArms && obstacleIndex == -1)
                                 steps = 0;
-                            else if (pull(obstacles, 'd') && pulling)
+                            else if (pull(obstacles, 'd') && pullingDown)
                             {
+                                if (instance.State == SoundState.Stopped)
+                                    instance.Play();
                                 obstacles[obstacleIndex].Y += MyGlobals.blockSize / 10;
                                 this.position.Y += MyGlobals.blockSize / 10;
                                 if (isLegs && steps % 5 == 0)
@@ -154,6 +176,8 @@ namespace Torn
                             }
                             else if (hasObstacle(obstacles, 'd') && isArms && obstacleIndex != -1 && !haswalls(walls, 'd'))
                             {
+                                if (instance.State == SoundState.Stopped)
+                                    instance.Play();
                                 obstacles[obstacleIndex].Y += MyGlobals.blockSize / 10;
                                 this.position.Y += MyGlobals.blockSize / 10;
                                 if (isLegs && steps % 5 == 0)
@@ -191,8 +215,10 @@ namespace Torn
                                 steps = 0;
                             else if (hasObstacle(obstacles, 'u') && isArms && obstacleIndex == -1)
                                 steps = 0;
-                            else if (pull(obstacles, 'u') && pulling)
+                            else if (pull(obstacles, 'u') && pullingUp)
                             {
+                                if (instance.State == SoundState.Stopped)
+                                    instance.Play();
                                 obstacles[obstacleIndex].Y -= MyGlobals.blockSize / 10;
                                 this.position.Y -= MyGlobals.blockSize / 10;
                                 if (isLegs && steps % 5 == 0)
@@ -208,6 +234,8 @@ namespace Torn
                             }
                             else if (hasObstacle(obstacles, 'u') && isArms && obstacleIndex != -1 && !haswalls(walls, 'u'))
                             {
+                                if (instance.State == SoundState.Stopped)
+                                    instance.Play();
                                 obstacles[obstacleIndex].Y -= MyGlobals.blockSize / 10;
                                 this.position.Y -= MyGlobals.blockSize / 10;
                                 if (isLegs && steps % 5 == 0)
@@ -246,8 +274,10 @@ namespace Torn
                                 steps = 0;
                             else if (hasObstacle(obstacles, 'r') && isArms && obstacleIndex == -1)
                                 steps = 0;
-                            else if (pull(obstacles, 'r') && pulling)
+                            else if (pull(obstacles, 'r') && pullingRight)
                             {
+                                if (instance.State == SoundState.Stopped)
+                                    instance.Play();
                                 obstacles[obstacleIndex].X += MyGlobals.blockSize / 10;
                                 this.position.X += MyGlobals.blockSize / 10;
                                 if (isLegs && steps % 5 == 0)
@@ -263,6 +293,8 @@ namespace Torn
                             }
                             else if (hasObstacle(obstacles, 'r') && isArms && obstacleIndex != -1 && !haswalls(walls, 'r'))
                             {
+                                if (instance.State == SoundState.Stopped)
+                                    instance.Play();
                                 obstacles[obstacleIndex].X += MyGlobals.blockSize / 10;
                                 this.position.X += MyGlobals.blockSize / 10;
                                 if (isLegs && steps % 5 == 0)
@@ -300,8 +332,10 @@ namespace Torn
                                 steps = 0;
                             else if (hasObstacle(obstacles, 'l') && isArms && obstacleIndex == -1)
                                 steps = 0;
-                            else if (pull(obstacles, 'l') && pulling)
+                            else if (pull(obstacles, 'l') && pullingLeft)
                             {
+                                if (instance.State == SoundState.Stopped)
+                                    instance.Play();
                                 obstacles[obstacleIndex].X -= MyGlobals.blockSize / 10;
                                 this.position.X -= MyGlobals.blockSize / 10;
                                 if (isLegs && steps % 5 == 0)
@@ -317,6 +351,8 @@ namespace Torn
                             }
                             else if (hasObstacle(obstacles, 'l') && isArms && obstacleIndex != -1 && !haswalls(walls, 'l'))
                             {
+                                if (instance.State == SoundState.Stopped)
+                                    instance.Play();
                                 obstacles[obstacleIndex].X -= MyGlobals.blockSize / 10;
                                 this.position.X -= MyGlobals.blockSize / 10;
                                 if (isLegs && steps % 5 == 0)
@@ -353,7 +389,10 @@ namespace Torn
                  * set the direction with a meaningless caracter and return the other attributes to their default values*/
                 if (steps == 0)
                 {
-                    pulling = false;
+                    pullingDown = false;
+                    pullingLeft = false;
+                    pullingRight = false;
+                    pullingUp = false;
                     moving = false;
                     steps = MyGlobals.steps;
                     if (isLegs)
@@ -400,7 +439,7 @@ namespace Torn
                     direction = '-';
                 }
 
-                if (keyboard.IsKeyDown(Keys.Down) && keyboard.IsKeyDown(Keys.LeftShift))
+                if (keyboard.IsKeyDown(Keys.Down) && keyboard.IsKeyDown(Keys.LeftShift) )
                     jump('d');
                 else if (keyboard.IsKeyDown(Keys.Up) && keyboard.IsKeyDown(Keys.LeftShift))
                     jump('u');
@@ -533,6 +572,51 @@ namespace Torn
             return false;
         }
 
+        public bool hasbridges(List<Sprite> bridges, char direction)
+        {
+            switch (direction)
+            {
+                case 'd':
+                    for (int i = 0; i < bridges.Count; i++)
+                    {
+                        if (this.Position.Y + MyGlobals.blockSize == bridges[i].Position.Y && this.Position.X == bridges[i].Position.X || hasObstacle(obstacles, 'd') && this.Position.Y + 2 * MyGlobals.blockSize == bridges[i].Position.Y && this.Position.X == bridges[i].Position.X)
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+                case 'u':
+                    for (int i = 0; i < bridges.Count; i++)
+                    {
+                        if (this.Position.Y - MyGlobals.blockSize == bridges[i].Position.Y && this.Position.X == bridges[i].Position.X || this.Position.Y - 2 * MyGlobals.blockSize == bridges[i].Position.Y && this.Position.X == bridges[i].Position.X && hasObstacle(obstacles, 'u'))
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+                case 'r':
+                    for (int i = 0; i < bridges.Count; i++)
+                    {
+                        if (this.Position.X + MyGlobals.blockSize == bridges[i].Position.X && this.Position.Y == bridges[i].Position.Y || this.Position.X + 2 * MyGlobals.blockSize == bridges[i].Position.X && this.Position.Y == bridges[i].Position.Y && hasObstacle(obstacles, 'r'))
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+                case 'l':
+                    for (int i = 0; i < bridges.Count; i++)
+                    {
+                        if (this.Position.X - MyGlobals.blockSize == bridges[i].Position.X && this.Position.Y == bridges[i].Position.Y || this.Position.X - 2 * MyGlobals.blockSize == bridges[i].Position.X && this.Position.Y == bridges[i].Position.Y && hasObstacle(obstacles, 'l'))
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+            }
+
+            return false;
+        }
+
         public bool hasObstacle(List<Sprite> obstacles, char direction)
         {
             int i, j;
@@ -554,7 +638,7 @@ namespace Torn
                             }
                             for (j = 0; j < obstacles.Count; j++)
                             {
-                                if (!pulling && (obstacles[i].Position.Y + MyGlobals.blockSize == obstacles[j].Position.Y && obstacles[i].Position.X == obstacles[j].Position.X || obstacles[i].Position.Y>= MyGlobals.heigh - MyGlobals.blockSize - MyGlobals.blockSize/2))
+                                if (!pullingUp && (obstacles[i].Position.Y + MyGlobals.blockSize == obstacles[j].Position.Y && obstacles[i].Position.X == obstacles[j].Position.X || obstacles[i].Position.Y>= MyGlobals.heigh - MyGlobals.blockSize - MyGlobals.blockSize/2))
                                 {
                                     //Return -1 to indicate that there is a double obstacle line.
                                     obstacleIndex = -1;
@@ -581,7 +665,7 @@ namespace Torn
                             }
                             for (j = 0; j < obstacles.Count; j++)
                             {
-                                if (!pulling && (obstacles[i].Position.Y - MyGlobals.blockSize == obstacles[j].Position.Y && obstacles[i].Position.X == obstacles[j].Position.X || obstacles[i].Position.Y <= MyGlobals.blockSize + MyGlobals.blockSize/2))
+                                if (!pullingDown && (obstacles[i].Position.Y - MyGlobals.blockSize == obstacles[j].Position.Y && obstacles[i].Position.X == obstacles[j].Position.X || obstacles[i].Position.Y <= MyGlobals.blockSize + MyGlobals.blockSize/2))
                                 {
                                     //Return -1 to indicate that there is a double obstacle line.
                                     obstacleIndex = -1;
@@ -608,7 +692,7 @@ namespace Torn
                             }
                             for (j = 0; j < obstacles.Count; j++)
                             {
-                                if (!pulling && (obstacles[i].Position.X + MyGlobals.blockSize == obstacles[j].Position.X && obstacles[i].Position.Y == obstacles[j].Position.Y || obstacles[i].Position.X >= MyGlobals.width - MyGlobals.blockSize - MyGlobals.blockSize / 2))
+                                if (!pullingLeft && (obstacles[i].Position.X + MyGlobals.blockSize == obstacles[j].Position.X && obstacles[i].Position.Y == obstacles[j].Position.Y || obstacles[i].Position.X >= MyGlobals.width - MyGlobals.blockSize - MyGlobals.blockSize / 2))
                                 {
                                     //Return -1 to indicate that there is a double obstacle line.
                                     obstacleIndex = -1;
@@ -635,7 +719,7 @@ namespace Torn
                             }
                             for (j = 0; j < obstacles.Count; j++)
                             {
-                                if (!pulling && (obstacles[i].Position.X - MyGlobals.blockSize == obstacles[j].Position.X && obstacles[i].Position.Y == obstacles[j].Position.Y || obstacles[i].Position.X <= MyGlobals.blockSize + MyGlobals.blockSize / 2))
+                                if (!pullingRight && (obstacles[i].Position.X - MyGlobals.blockSize == obstacles[j].Position.X && obstacles[i].Position.Y == obstacles[j].Position.Y || obstacles[i].Position.X <= MyGlobals.blockSize + MyGlobals.blockSize / 2))
                                 {
                                     //Return -1 to indicate that there is a double obstacle line.
                                     obstacleIndex = -1;
@@ -748,7 +832,7 @@ namespace Torn
                 switch (direction)
                 {
                     case 'd':
-                        if (hastrench(this.trench, 'd') && this.position.Y + MyGlobals.blockSize * 2 < MyGlobals.heigh - MyGlobals.blockSize/2)
+                        if ((hastrench(this.trench, 'd') || hasbridges(this.bridges, 'd')) && this.position.Y + MyGlobals.blockSize * 2 < MyGlobals.heigh - MyGlobals.blockSize/2)
                         {
                             for (i = 0; i < trench.Count; i++)
                             {
@@ -774,7 +858,7 @@ namespace Torn
                         }
                         break;
                     case 'u':
-                        if (hastrench(this.trench, 'u') && this.position.Y - MyGlobals.blockSize * 2 > MyGlobals.blockSize / 2)
+                        if ((hastrench(this.trench, 'u') || hasbridges(this.bridges, 'u')) && this.position.Y - MyGlobals.blockSize * 2 > MyGlobals.blockSize / 2)
                         {
                             for (i = 0; i < trench.Count; i++)
                             {
@@ -805,7 +889,7 @@ namespace Torn
                             if (this.position.X - MyGlobals.blockSize * 2 == walls[i].Position.X && this.position.Y == walls[i].Position.Y)
                                 return;
                         }
-                        if (hastrench(this.trench, 'l') && this.position.X - MyGlobals.blockSize * 2 > MyGlobals.blockSize / 2)
+                        if ((hastrench(this.trench, 'l') || hasbridges(this.bridges, 'l')) && this.position.X - MyGlobals.blockSize * 2 > MyGlobals.blockSize / 2)
                         {
                             for (i = 0; i < trench.Count; i++)
                             {
@@ -833,7 +917,7 @@ namespace Torn
                             if (this.position.X + MyGlobals.blockSize * 2 == walls[i].Position.X && this.position.Y == walls[i].Position.Y)
                                 return;
                         }
-                        if (hastrench(this.trench, 'r') && this.position.X + MyGlobals.blockSize * 2 < MyGlobals.width - MyGlobals.blockSize / 2)
+                        if ((hastrench(this.trench, 'r') || hasbridges(this.bridges, 'r'))  && this.position.X + MyGlobals.blockSize * 2 < MyGlobals.width - MyGlobals.blockSize / 2)
                         {
                             for (i = 0; i < trench.Count; i++)
                             {
@@ -860,7 +944,7 @@ namespace Torn
 
         public bool pull(List<Sprite> obstacles, char direction)
         {
-            if(isArms)
+            if (isArms)
             {
                 switch (direction)
                 {
