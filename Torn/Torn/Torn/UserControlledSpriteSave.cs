@@ -13,7 +13,9 @@ namespace Torn
     {
         public UserControlledSpriteSave(String textureFile, Vector2 position, Vector2 center, Color color)
             : base(textureFile, position, center, color)
-        { }
+        {
+           
+        }
 
         public void SaveToFile(String saveFileName)
         {

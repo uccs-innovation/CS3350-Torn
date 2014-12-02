@@ -24,3 +24,7 @@ Content\Sounds\Nice.xnb
 Content\Sounds\PressurePlateOn.xnb
 Content\Sounds\ThrownHead.xnb
 Content\Sounds\didIt.xnb
+Content\Images\arrow.xnb
+Content\Images\menu.xnb
+Content\Images\menu1.xnb
+Content\Images\emptyLoad.xnb

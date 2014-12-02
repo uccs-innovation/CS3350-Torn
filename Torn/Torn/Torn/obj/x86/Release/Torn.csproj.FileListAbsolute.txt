@@ -34,3 +34,7 @@ C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\obj\x86\Release\Torn.exe.m
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\obj\x86\Release\Torn.application
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\obj\x86\Release\Torn.exe
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\obj\x86\Release\Torn.pdb
+C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\arrow.xnb
+C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\menu.xnb
+C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\menu1.xnb
+C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\emptyLoad.xnb

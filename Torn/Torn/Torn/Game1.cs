@@ -14,11 +14,12 @@ namespace Torn
 {
     public class Game1 : Microsoft.Xna.Framework.Game
     {
+
         GraphicsDeviceManager graphics;
         public SpriteBatch spriteBatch;
         Sprite initialScreen;
         Vector2 initialPosition, finalPosition;
-        bool started;
+        bool started, menu, menu1, emptyLoad;
         KeyboardState keyboard;
         UserControlledSprite[] body;
         Sprite blindness, highlightedGrass;
@@ -35,14 +36,14 @@ namespace Torn
         List<Sprite> plates;
         List<Sprite> bridges;
         int[] finished;
-        Sprite aux, textBox;
+        Sprite aux, textBox, gameMenu, arrow, gameMenu1, emptyLoadScreen;
         List<Vector2> indexesBellow, indexesRight, indexesLeft, indexesAbove;
         List<Sprite> hiddenAbove, hiddenBellow, hiddenRight, hiddenLeft;
         Song ambientSound;
         SoundEffect kick, nice, pressurePlateOn, thrownHead, didIt;
         Text text;
         String tutorial;
-        int countBellow, countAbove, countLeft, countRight, messageIndex;
+        int countBellow, countAbove, countLeft, countRight, messageIndex, partMoving;
         KeyboardState old;
         int levelNumber, levelAux, bridgesNumber;
         Sprite enter;
@@ -58,8 +59,6 @@ namespace Torn
             ambientSound = Content.Load<Song>(@"Sounds\ambientSound");
             MediaPlayer.Play(ambientSound);
             MediaPlayer.IsRepeating = true;
-
-
 
             counter = 300;
 
@@ -94,9 +93,13 @@ namespace Torn
             levelNumber = 1;
             levelAux = levelNumber;
             bridgesNumber = 0;
+            partMoving = 0;
             
             body = new UserControlledSprite[3];
             started = false;
+            menu = false;
+            menu1 = false;
+            emptyLoad = false;
             field = new int[MyGlobals.numberOfBlocksY, MyGlobals.numberOfBlocksX];
             trench = new List<Sprite>();
             obstacles = new List<Sprite>();
@@ -263,13 +266,18 @@ namespace Torn
             
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            
 
+            emptyLoadScreen = new Sprite(this, @"Images\emptyLoad", new Vector2(MyGlobals.width / 2, MyGlobals.heigh / 2));
+            
             readField(levelNumber.ToString());
             highlightedGrass = new Sprite(this, @"Images\highlightedGrass", new Vector2(0, 0));
             grasses = new List<Sprite>();
 
-            if (!started)
+            gameMenu = new Sprite(this, @"Images\menu", new Vector2(MyGlobals.width / 2, MyGlobals.heigh / 2));
+            gameMenu1 = new Sprite(this, @"Images\menu1", new Vector2(MyGlobals.width / 2, MyGlobals.heigh / 2));
+            arrow = new Sprite(this, @"Images\arrow", new Vector2(100, 210));
+
+            if (!started && !menu && !menu1) 
             {
                 kick = Content.Load<SoundEffect>(@"Sounds\Kick");
                 nice = Content.Load<SoundEffect>(@"Sounds\Nice");
@@ -281,6 +289,18 @@ namespace Torn
                 initialPosition.Y = graphics.PreferredBackBufferHeight / 2;
                 initialScreen = new Sprite(this, @"Images\InitialScreen", initialPosition);
                 Components.Add(initialScreen);
+            }
+            else if (!started && menu && !menu1)
+            {
+                Components.Remove(initialScreen);
+                Components.Add(gameMenu);
+                Components.Add(arrow);
+            }
+            else if(!started && menu1 && !menu)
+            {
+                Components.Add(gameMenu1);
+                Components.Add(arrow);
+
             }
             else if(levelFinished())
             {
@@ -317,11 +337,12 @@ namespace Torn
                 finished[2] = 0;
                 readField(levelNumber.ToString());
             }
-            
-            if (started)
+
+            if (started && !menu1 && !menu)
             {
                 //Takes the initial screen off and displays the body parts
-                Components.Remove(initialScreen);
+                Components.Remove(arrow);
+                Components.Remove(gameMenu);
 
                 for (int i = 0; i < MyGlobals.numberOfBlocksY; i++)
                 {
@@ -541,20 +562,148 @@ namespace Torn
 
             keyboard = Keyboard.GetState();
 
-            //Waits for the first ENTER to initialize the game
-            if (keyboard.IsKeyDown(Keys.Enter) && !started)
+            if(keyboard.IsKeyDown(Keys.Space) && !started && !menu && !menu1)
             {
-                started = true;
-                //Call the method LoadContent() in order to initialize the body parts
+                menu = true;
                 LoadContent();
             }
-             
+
+            if (emptyLoad)
+            {
+                if (Components.IndexOf(emptyLoadScreen) == -1)
+                    Components.Add(emptyLoadScreen);
+                if (!keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter))
+                {
+                    emptyLoad = false;
+                    Components.Remove(emptyLoadScreen);
+                }
+                old = keyboard;
+            }
+
+            if(menu)
+            {
+                if(!keyboard.IsKeyDown(Keys.Down) && old.IsKeyDown(Keys.Down) && arrow.Position.Y < 570)
+                {
+                    arrow.Position = new Vector2(arrow.Position.X, arrow.Position.Y + MyGlobals.blockSize * 2);
+                }
+                else if (!keyboard.IsKeyDown(Keys.Up) && old.IsKeyDown(Keys.Up) && arrow.Position.Y > 210)
+                {
+                    arrow.Position = new Vector2(arrow.Position.X, arrow.Position.Y - MyGlobals.blockSize * 2);
+                }
+
+                if (arrow.Position.Y == 210 && !keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter))
+                {
+                    menu = false;
+                    started = true;
+                    LoadContent();
+                }
+                else if (arrow.Position.Y == 330 && !keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter))
+                {
+                    System.IO.StreamReader file = new System.IO.StreamReader(@"Save\save.txt");
+                    String line;
+
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        if (int.Parse(line[0].ToString()) != 0)
+                        {
+                            levelNumber = int.Parse(line[0].ToString());
+                            started = true;
+                            menu = false;
+                            LoadContent();
+                        }
+                        else
+                        {
+                            emptyLoad = true;
+                        }
+                    }
+                }
+                else if (arrow.Position.Y == 570 && !keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter))
+                {
+                    this.Exit();
+                }
+                
+
+                old = keyboard;
+            }
+
+            if(menu1)
+            {
+                if (!keyboard.IsKeyDown(Keys.Down) && old.IsKeyDown(Keys.Down) && arrow.Position.Y < 570)
+                {
+                    arrow.Position = new Vector2(arrow.Position.X, arrow.Position.Y + MyGlobals.blockSize * 2);
+                }
+                else if (!keyboard.IsKeyDown(Keys.Up) && old.IsKeyDown(Keys.Up) && arrow.Position.Y > 210)
+                {
+                    arrow.Position = new Vector2(arrow.Position.X, arrow.Position.Y - MyGlobals.blockSize * 2);
+                }
+
+                if (arrow.Position.Y == 210 && !keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter))
+                {
+                    menu1 = false;
+                    started = true;
+                    Components.Remove(gameMenu1);
+                    Components.Remove(arrow);
+                }
+                else if(arrow.Position.Y == 330 && !keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter))
+                {
+                    menu1 = false;
+                    started = true;
+
+                    finished[0] = 1;
+                    finished[1] = 1;
+                    finished[2] = 1;
+
+                    LoadContent();
+                }
+                else if (arrow.Position.Y == 450 && !keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter))
+                {
+                    System.IO.StreamWriter file = new System.IO.StreamWriter(@"Save\save.txt");
+
+                    file.WriteLine(levelNumber.ToString());
+
+                    file.Close();
+
+
+                    body[partMoving].change = true;
+
+                    menu1 = false;
+                    started = true;
+                    Components.Remove(arrow);
+                    Components.Remove(gameMenu1);
+                    
+                }
+                else if (arrow.Position.Y == 570 && !keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter))
+                {
+                    this.Exit();
+                }
+                old = keyboard;
+            }
+
+
+            
+
             if(started)
             {
                 body[0].Obstacles = body[1].Obstacles;
                 body[2].Obstacles = body[1].Obstacles;
 
                 counter -= gameTime.ElapsedGameTime.Seconds;
+
+                if(keyboard.IsKeyDown(Keys.Escape))
+                {
+                    if (body[0].change)
+                        partMoving = 0;
+                    else if (body[1].change)
+                        partMoving = 1;
+                    else if (body[2].change)
+                        partMoving = 2;
+                    body[0].change = false;
+                    body[1].change = false;
+                    body[2].change = false;
+                    started = false;
+                    menu1 = true;
+                    LoadContent();
+                }
             }
 
             //Tutorial
@@ -659,21 +808,21 @@ namespace Torn
 
             
             //Checks which part will move according with the user input, if the game is already started and if there is any other body part moving
-            if (keyboard.IsKeyDown(Keys.H) && started && !isBodyMoving())
+            if (keyboard.IsKeyDown(Keys.H) && started && !isBodyMoving() && !menu1)
             {
                 //If the head was selected, set the bool attribute 'change' in body[0] as true and in the other parts as false, in this way, only the head will move 
                 body[0].change = true;
                 body[1].change = false;
                 body[2].change = false;
             }
-            else if (keyboard.IsKeyDown(Keys.A) && started && !isBodyMoving())
+            else if (keyboard.IsKeyDown(Keys.A) && started && !isBodyMoving() && !menu1)
             {
                 //If the arms was selected, set the bool attribute 'change' in body[1] as true and in the other parts as false, in this way, only the arms will move
                 body[0].change = false;
                 body[1].change = true;
                 body[2].change = false;    
             }
-            else if (keyboard.IsKeyDown(Keys.L) && started && !isBodyMoving())
+            else if (keyboard.IsKeyDown(Keys.L) && started && !isBodyMoving() && !menu1)
             {
                 //If the legs was selected, set the bool attribute 'change' in body[2] as true and in the other parts as false, in this way, only the legs will move
                 body[0].change = false;
@@ -681,7 +830,7 @@ namespace Torn
                 body[2].change = true;
             }
             //Kicks the body parts
-            if (started && body[2].change)
+            if (started && body[2].change && !menu1)
             {
                 if (keyboard.IsKeyDown(Keys.LeftShift) && keyboard.IsKeyDown(Keys.Down))
                 {
@@ -757,7 +906,7 @@ namespace Torn
                     body[1].Position = new Vector2(body[1].Position.X, MyGlobals.blockSize + MyGlobals.blockSize/2);
             }
             //Throws the body parts
-            if (started && body[1].change)
+            if (started && body[1].change && !menu1)
             {
                 if (keyboard.IsKeyDown(Keys.LeftShift) && keyboard.IsKeyDown(Keys.Down))
                 {
@@ -821,7 +970,7 @@ namespace Torn
                     body[2].Position = new Vector2(body[2].Position.X, MyGlobals.blockSize + MyGlobals.blockSize / 2);
             }
 
-            if (started)
+            if (started && !menu1)
             {
                 int count;
                 indexesBellow = body[0].hidden(blockSight, 'd');
@@ -996,7 +1145,7 @@ namespace Torn
                 }
             }
 
-            if (started)
+            if (started && !menu1)
             {
                 //Give to blindness sprite, the same position of the head
                 blindness.Position = body[0].Position;
@@ -1023,31 +1172,7 @@ namespace Torn
                     finished[2] = 1;
                 }
 
-                if(started && keyboard.IsKeyDown(Keys.R))
-                {
-
-                    body[1].Walls.Remove(body[0]);
-                    body[2].Walls.Remove(body[0]);
-                    finished[0] = 1;
-
-                    Components.Remove(body[1]);
-                    body[0].Walls.Remove(body[1]);
-                    body[2].Walls.Remove(body[1]);
-                    finished[1] = 1;
-
-                    Components.Remove(body[2]);
-                    body[0].Walls.Remove(body[2]);
-                    body[1].Walls.Remove(body[2]);
-                    finished[2] = 1;
-
-
-                    body[0].Obstacles = new List<Sprite>();
-                    body[0].Trench = new List<Sprite>();
-                    body[0].Walls = new List<Sprite>();
-                    body[0].Bridge = new List<Sprite>();
-                    body[0].Indexes = new List<Vector2>();
-                    LoadContent();
-                }
+                
 
                 if(levelFinished())
                 {

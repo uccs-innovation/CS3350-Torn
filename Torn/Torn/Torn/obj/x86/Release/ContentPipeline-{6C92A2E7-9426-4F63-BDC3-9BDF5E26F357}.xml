@@ -8,7 +8,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\InitialScreen.xnb</Output>
-      <Time>2014-11-20T01:50:55.3425805-07:00</Time>
+      <Time>2014-12-02T00:17:08.0064763-07:00</Time>
     </Item>
     <Item>
       <Source>Images\Arms.png</Source>
@@ -226,6 +226,42 @@
       <Options>None</Options>
       <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Sounds\didIt.xnb</Output>
       <Time>2014-11-20T02:41:26.4513581-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Images\arrow.png</Source>
+      <Name>Images\arrow</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\arrow.xnb</Output>
+      <Time>2014-12-01T23:56:14.3800647-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Images\menu.png</Source>
+      <Name>Images\menu</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\menu.xnb</Output>
+      <Time>2014-12-02T11:08:26.0443318-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Images\menu1.png</Source>
+      <Name>Images\menu1</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\menu1.xnb</Output>
+      <Time>2014-12-02T11:44:09.389726-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Images\emptyLoad.png</Source>
+      <Name>Images\emptyLoad</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\emptyLoad.xnb</Output>
+      <Time>2014-12-02T14:10:26.6855237-07:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
