@@ -29,7 +29,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationRevision>5</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -103,6 +103,14 @@
     <Content Include="GameThumbnail.png">
       <XnaPlatformSpecific>true</XnaPlatformSpecific>
     </Content>
+    <Content Include="Levels\level1.txt" />
+    <Content Include="Levels\level2.txt" />
+    <Content Include="Levels\level3.txt" />
+    <Content Include="Levels\level4.txt" />
+    <Content Include="Levels\level5.txt" />
+    <Content Include="Levels\level6.txt" />
+    <Content Include="Levels\levelTeste.txt" />
+    <Content Include="Levels\levelteste1.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TornContent\TornContent.contentproj">

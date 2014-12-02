@@ -138,7 +138,9 @@ namespace Torn
             string line;
             int i = 0, j = 0, k = 0, lastJ = 0, lastI = 0, result = 0, rest = 0;
 
-            System.IO.StreamReader file = new System.IO.StreamReader(@"Levels\level"+levelName+".txt");
+            //Try catcher
+            System.IO.StreamReader file = new System.IO.StreamReader(@"Levels\level" + levelName + ".txt");
+            
 
             while ((line = file.ReadLine()) != null)
             {
