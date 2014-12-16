@@ -28,9 +28,25 @@ namespace Torn
         List<Vector2> indexes;
         SoundEffect movingBox;
         SoundEffectInstance instance;
+        UserControlledSprite body1, body2;
+        Vector2 final;
 
-        public UserControlledSprite(Game game, String textureFile, Vector2 position, bool isArms, bool isLegs)
-            : base(game, textureFile, position)
+        public Vector2 Final
+        {
+            get { return final; }
+            set { final = value; }
+        }
+        public UserControlledSprite Body1
+        {
+            get { return body1; }
+            set { body1 = value; }
+        }
+        public UserControlledSprite Body2
+        {
+            get { return body2; }
+            set { body2 = value; }
+        }
+        public UserControlledSprite(Game game, String textureFile, Vector2 position, bool isArms, bool isLegs): base(game, textureFile, position)
         {
             //Initializes all the attributes with false in order to control the execution of the program
             update = false;
@@ -149,8 +165,9 @@ namespace Torn
                     //moves 3 pixels according with the last key pressed
                     switch (direction)
                     {
+                            
                         case 'd':
-                            if (hastrench(trench, 'd') || haswalls(walls, 'd'))
+                            if (hastrench(trench, 'd') || haswalls(walls, 'd') || hasBody('d'))
                                 steps = 0;
                             else if (this.position.Y >= MyGlobals.heigh - MyGlobals.blockSize / 2)
                                 steps = 0;
@@ -211,7 +228,7 @@ namespace Torn
                             }
                             break;
                         case 'u':
-                            if (hastrench(trench, 'u') || haswalls(walls, 'u'))
+                            if (hastrench(trench, 'u') || haswalls(walls, 'u') || hasBody('u'))
                                 steps = 0;
                             else if (this.position.Y <= MyGlobals.blockSize / 2)
                                 steps = 0;
@@ -273,7 +290,7 @@ namespace Torn
                             }
                             break;
                         case 'r':
-                            if (hastrench(trench, 'r') || haswalls(walls, 'r'))
+                            if (hastrench(trench, 'r') || haswalls(walls, 'r') || hasBody('r'))
                                 steps = 0;
                             else if (this.position.X >= MyGlobals.width - MyGlobals.blockSize / 2)
                                 steps = 0;
@@ -334,7 +351,7 @@ namespace Torn
                             }
                             break;
                         case 'l':
-                            if (hastrench(trench, 'l') || haswalls(walls, 'l'))
+                            if (hastrench(trench, 'l') || haswalls(walls, 'l') || hasBody('l'))
                                 steps = 0;
                             else if (this.position.X <= MyGlobals.blockSize / 2)
                                 steps = 0;
@@ -542,6 +559,7 @@ namespace Torn
 
         public bool haswalls(List<Sprite> walls, char direction)
         {
+
             switch (direction)
             {
                 case 'd':
@@ -549,6 +567,13 @@ namespace Torn
                     {
                         if (this.Position.Y + MyGlobals.blockSize == walls[i].Position.Y && this.Position.X == walls[i].Position.X || hasObstacle(obstacles, 'd') && this.Position.Y + 2 * MyGlobals.blockSize == walls[i].Position.Y && this.Position.X == walls[i].Position.X)
                         {
+                            for (int j = 0; j < obstacles.Count; j++)
+                            {
+                                if (walls[i].Position == obstacles[j].Position)
+                                {
+                                    return false;
+                                }
+                            }
                             return true;
                         }
                     }
@@ -558,6 +583,13 @@ namespace Torn
                     {
                         if (this.Position.Y - MyGlobals.blockSize == walls[i].Position.Y && this.Position.X == walls[i].Position.X || this.Position.Y - 2 * MyGlobals.blockSize == walls[i].Position.Y && this.Position.X == walls[i].Position.X && hasObstacle(obstacles, 'u'))
                         {
+                            for (int j = 0; j < obstacles.Count; j++)
+                            {
+                                if (walls[i].Position == obstacles[j].Position)
+                                {
+                                    return false;
+                                }
+                            }
                             return true;
                         }
                     }
@@ -567,6 +599,13 @@ namespace Torn
                     {
                         if (this.Position.X + MyGlobals.blockSize == walls[i].Position.X && this.Position.Y == walls[i].Position.Y || this.Position.X + 2 * MyGlobals.blockSize == walls[i].Position.X && this.Position.Y == walls[i].Position.Y && hasObstacle(obstacles, 'r'))
                         {
+                            for (int j = 0; j < obstacles.Count; j++)
+                            {
+                                if (walls[i].Position == obstacles[j].Position)
+                                {
+                                    return false;
+                                }
+                            }
                             return true;
                         }
                     }
@@ -576,6 +615,13 @@ namespace Torn
                     {
                         if (this.Position.X - MyGlobals.blockSize == walls[i].Position.X && this.Position.Y == walls[i].Position.Y || this.Position.X - 2 * MyGlobals.blockSize == walls[i].Position.X && this.Position.Y == walls[i].Position.Y && hasObstacle(obstacles, 'l'))
                         {
+                            for (int j = 0; j < obstacles.Count; j++)
+                            {
+                                if (walls[i].Position == obstacles[j].Position)
+                                {
+                                    return false;
+                                }
+                            }
                             return true;
                         }
                     }
@@ -641,6 +687,11 @@ namespace Torn
                     {
                         if (this.Position.Y + MyGlobals.blockSize == obstacles[i].Position.Y && this.Position.X == obstacles[i].Position.X)
                         {
+                            for (j = 0; j < obstacles.Count; j++)
+                            {
+                                if (obstacles[i].Position == obstacles[j].Position && i != j)
+                                    return true;
+                            }
                             for (j = 0; j < trench.Count; j++)
                             {
                                 if (obstacles[i].Position == trench[j].Position)
@@ -649,10 +700,16 @@ namespace Torn
                                     return false;
                                 }
                             }
+
                             for (j = 0; j < obstacles.Count; j++)
                             {
-                                if (!pullingUp && (obstacles[i].Position.Y + MyGlobals.blockSize == obstacles[j].Position.Y && obstacles[i].Position.X == obstacles[j].Position.X || obstacles[i].Position.Y>= MyGlobals.heigh - MyGlobals.blockSize - MyGlobals.blockSize/2))
+                                if (!pullingUp && (obstacles[i].Position.Y + MyGlobals.blockSize == obstacles[j].Position.Y && obstacles[i].Position.X == obstacles[j].Position.X || obstacles[i].Position.Y>= MyGlobals.heigh - MyGlobals.blockSize/2))
                                 {
+                                    for (int k = 0; k < trench.Count; k++)
+                                    {
+                                        if (obstacles[j].Position == trench[k].Position)
+                                            return true;
+                                    }
                                     //Return -1 to indicate that there is a double obstacle line.
                                     obstacleIndexDown = -1;
                                     return true;
@@ -668,6 +725,11 @@ namespace Torn
                     {
                         if (this.Position.Y - MyGlobals.blockSize == obstacles[i].Position.Y && this.Position.X == obstacles[i].Position.X)
                         {
+                            for (j = 0; j < obstacles.Count; j++)
+                            {
+                                if (obstacles[i].Position == obstacles[j].Position && i != j)
+                                    return true;
+                            }
                             for (j = 0; j < trench.Count; j++)
                             {
                                 if (obstacles[i].Position == trench[j].Position)
@@ -678,8 +740,13 @@ namespace Torn
                             }
                             for (j = 0; j < obstacles.Count; j++)
                             {
-                                if (!pullingDown && (obstacles[i].Position.Y - MyGlobals.blockSize == obstacles[j].Position.Y && obstacles[i].Position.X == obstacles[j].Position.X || obstacles[i].Position.Y <= MyGlobals.blockSize + MyGlobals.blockSize/2))
+                                if (!pullingDown && (obstacles[i].Position.Y - MyGlobals.blockSize == obstacles[j].Position.Y && obstacles[i].Position.X == obstacles[j].Position.X || obstacles[i].Position.Y <= MyGlobals.blockSize/2))
                                 {
+                                    for (int k = 0; k < trench.Count; k++)
+                                    {
+                                        if (obstacles[j].Position == trench[k].Position)
+                                            return true;
+                                    }
                                     //Return -1 to indicate that there is a double obstacle line.
                                     obstacleIndexUp = -1;
                                     return true;
@@ -695,6 +762,11 @@ namespace Torn
                     {
                         if (this.Position.X + MyGlobals.blockSize == obstacles[i].Position.X && this.Position.Y == obstacles[i].Position.Y)
                         {
+                            for (j = 0; j < obstacles.Count; j++)
+                            {
+                                if (obstacles[i].Position == obstacles[j].Position && i != j)
+                                    return true;
+                            }
                             for (j = 0; j < trench.Count; j++)
                             {
                                 if (obstacles[i].Position == trench[j].Position)
@@ -705,8 +777,13 @@ namespace Torn
                             }
                             for (j = 0; j < obstacles.Count; j++)
                             {
-                                if (!pullingLeft && (obstacles[i].Position.X + MyGlobals.blockSize == obstacles[j].Position.X && obstacles[i].Position.Y == obstacles[j].Position.Y || obstacles[i].Position.X >= MyGlobals.width - MyGlobals.blockSize - MyGlobals.blockSize / 2))
+                                if (!pullingLeft && (obstacles[i].Position.X + MyGlobals.blockSize == obstacles[j].Position.X && obstacles[i].Position.Y == obstacles[j].Position.Y || obstacles[i].Position.X >= MyGlobals.width -MyGlobals.blockSize / 2))
                                 {
+                                    for (int k = 0; k < trench.Count; k++)
+                                    {
+                                        if (obstacles[j].Position == trench[k].Position)
+                                            return true;
+                                    }
                                     //Return -1 to indicate that there is a double obstacle line.
                                     obstacleIndexRight = -1;
                                     return true;
@@ -722,6 +799,11 @@ namespace Torn
                     {
                         if (this.Position.X - MyGlobals.blockSize == obstacles[i].Position.X && this.Position.Y == obstacles[i].Position.Y)
                         {
+                            for (j = 0; j < obstacles.Count; j++)
+                            {
+                                if (obstacles[i].Position == obstacles[j].Position && i != j)
+                                    return true;
+                            }
                             for (j = 0; j < trench.Count; j++)
                             {
                                 if (obstacles[i].Position == trench[j].Position)
@@ -732,8 +814,13 @@ namespace Torn
                             }
                             for (j = 0; j < obstacles.Count; j++)
                             {
-                                if (!pullingRight && (obstacles[i].Position.X - MyGlobals.blockSize == obstacles[j].Position.X && obstacles[i].Position.Y == obstacles[j].Position.Y || obstacles[i].Position.X <= MyGlobals.blockSize + MyGlobals.blockSize / 2))
+                                if (!pullingRight && (obstacles[i].Position.X - MyGlobals.blockSize == obstacles[j].Position.X && obstacles[i].Position.Y == obstacles[j].Position.Y || obstacles[i].Position.X <= MyGlobals.blockSize / 2))
                                 {
+                                    for (int k = 0; k < trench.Count; k++)
+                                    {
+                                        if (obstacles[j].Position == trench[k].Position)
+                                            return true;
+                                    }
                                     //Return -1 to indicate that there is a double obstacle line.
                                     obstacleIndexLeft = -1;
                                     return true;
@@ -748,6 +835,30 @@ namespace Torn
             return false;
         }
 
+        public bool hasBody(char direction)
+        {
+            switch (direction)
+            {
+                case 'd':
+                    if ((this.position.Y + MyGlobals.blockSize == body1.Position.Y && this.position.X == body1.Position.X || this.position.Y + MyGlobals.blockSize == body2.Position.Y && this.position.X == body2.Position.X) && body1.Position != final && body2.Position != final)
+                        return true;
+                    break;
+                case 'u':
+                    if ((this.position.Y - MyGlobals.blockSize == body1.Position.Y && this.position.X == body1.Position.X || this.position.Y - MyGlobals.blockSize == body2.Position.Y && this.position.X == body2.Position.X) && body1.Position != final && body2.Position != final)
+                        return true;
+                    break;
+                case 'r':
+                    if ((this.position.X + MyGlobals.blockSize == body1.Position.X && this.position.Y == body1.Position.Y || this.position.X + MyGlobals.blockSize == body2.Position.X && this.position.Y == body2.Position.Y) && body1.Position != final && body2.Position != final)
+                        return true;
+                    break;
+                case 'l':
+                    if ((this.position.X - MyGlobals.blockSize == body1.Position.X && this.position.Y == body1.Position.Y || this.position.X - MyGlobals.blockSize == body2.Position.X && this.position.Y == body2.Position.Y) && body1.Position != final && body2.Position != final)
+                        return true;
+                    break;
+            }
+            return false;
+        }
+              
         public bool kick(Sprite body, char direction)
         {
             keyboard = Keyboard.GetState();
@@ -764,7 +875,18 @@ namespace Torn
                     if (body.Position.X + MyGlobals.blockSize * 2 == walls[i].Position.X && body.Position.Y == walls[i].Position.Y && direction == 'r')
                         return false;
                 }
-                
+
+                for (int i = 0; i < obstacles.Count; i++)
+                {
+                    if (body.Position.Y + MyGlobals.blockSize * 2 == obstacles[i].Position.Y && body.Position.X == obstacles[i].Position.X && direction == 'd')
+                        return false;
+                    if (body.Position.Y - MyGlobals.blockSize * 2 == obstacles[i].Position.Y && body.Position.X == obstacles[i].Position.X && direction == 'u')
+                        return false;
+                    if (body.Position.X - MyGlobals.blockSize * 2 == obstacles[i].Position.X && body.Position.Y == obstacles[i].Position.Y && direction == 'l')
+                        return false;
+                    if (body.Position.X + MyGlobals.blockSize * 2 == obstacles[i].Position.X && body.Position.Y == obstacles[i].Position.Y && direction == 'r')
+                        return false;
+                }
 
                 if (this.position.Y + MyGlobals.blockSize == body.Position.Y && this.position.X == body.Position.X && direction == 'd')
                 {

@@ -19,7 +19,7 @@
     <ApplicationIcon>Game.ico</ApplicationIcon>
     <Thumbnail>GameThumbnail.png</Thumbnail>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>C:\Users\Cristiano\Desktop\teste\</PublishUrl>
+    <PublishUrl>C:\Users\Cristiano\Desktop\SETUP TORN\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -29,7 +29,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>6</ApplicationRevision>
+    <ApplicationRevision>9</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -108,9 +108,6 @@
     <Content Include="Levels\level3.txt" />
     <Content Include="Levels\level4.txt" />
     <Content Include="Levels\level5.txt" />
-    <Content Include="Levels\level6.txt" />
-    <Content Include="Levels\levelTeste.txt" />
-    <Content Include="Levels\levelteste1.txt" />
     <Content Include="Save\save.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -144,7 +141,9 @@
   <ItemGroup>
     <None Include="Torn_TemporaryKey.pfx" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Levels\Custom\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

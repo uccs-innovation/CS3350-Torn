@@ -28,3 +28,11 @@ Content\Images\arrow.xnb
 Content\Images\menu.xnb
 Content\Images\menu1.xnb
 Content\Images\emptyLoad.xnb
+Content\Images\emptyField.xnb
+Content\Images\elements.xnb
+Content\Images\levelList.xnb
+Content\Images\died.xnb
+Content\Images\blockers.xnb
+Content\Images\FinalArms.xnb
+Content\Images\FinalHead.xnb
+Content\Images\FinalLegs.xnb

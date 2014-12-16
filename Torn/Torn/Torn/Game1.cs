@@ -19,11 +19,13 @@ namespace Torn
         public SpriteBatch spriteBatch;
         Sprite initialScreen;
         Vector2 initialPosition, finalPosition;
-        bool started, menu, menu1, emptyLoad;
+        bool started, menu, menu1, emptyLoad, levelEditor, selectLevel, isDead, allowHead, allowArms, allowLegs;
         KeyboardState keyboard;
         UserControlledSprite[] body;
+        UserControlledSprite builder;
         Sprite blindness, highlightedGrass;
         int[,] field;
+        int[,] bField;
         List<Vector2> blockSight;
         List<Sprite> trench;
         List<Sprite> obstacles;
@@ -35,20 +37,27 @@ namespace Torn
         List<Sprite> walls;
         List<Sprite> plates;
         List<Sprite> bridges;
+        List<Sprite> tempField;
+        List<Sprite> blockers;
+        Sprite finalArms, finalHead, finalLegs, finalBody;
+        int lastLevel, custLevelNbr;
+
         int[] finished;
-        Sprite aux, textBox, gameMenu, arrow, gameMenu1, emptyLoadScreen;
+        Sprite aux, textBox, gameMenu, arrow, gameMenu1, emptyLoadScreen, emptyField, died;
         List<Vector2> indexesBellow, indexesRight, indexesLeft, indexesAbove;
         List<Sprite> hiddenAbove, hiddenBellow, hiddenRight, hiddenLeft;
         Song ambientSound;
         SoundEffect kick, nice, pressurePlateOn, thrownHead, didIt;
-        Text text;
+        Text text, textAux;
+        List<Text> levels;
         String tutorial;
         int countBellow, countAbove, countLeft, countRight, messageIndex, partMoving;
         KeyboardState old;
         int levelNumber, levelAux, bridgesNumber;
-        Sprite enter;
+        Sprite enter, levelList;
         float counter;
         List<Sprite> bridgeOn, bridgeOff;
+        String customLevelNbrAux;
 
         public Game1()
         {
@@ -61,6 +70,9 @@ namespace Torn
             MediaPlayer.IsRepeating = true;
 
             counter = 300;
+            lastLevel = 0;
+            custLevelNbr = 0;
+            customLevelNbrAux = "0";
 
             //Initialize all the global variables
             MyGlobals.width = 480 * 2;
@@ -89,7 +101,7 @@ namespace Torn
             graphics.PreferredBackBufferWidth = MyGlobals.width;
             graphics.PreferredBackBufferHeight = MyGlobals.heigh;
 
-            messageIndex = 0;
+            messageIndex = 1;
             levelNumber = 1;
             levelAux = levelNumber;
             bridgesNumber = 0;
@@ -100,7 +112,14 @@ namespace Torn
             menu = false;
             menu1 = false;
             emptyLoad = false;
+            levelEditor = false;
+            selectLevel = false;
+            allowArms = false;
+            allowHead = false;
+            allowLegs = false;
+            isDead = false;
             field = new int[MyGlobals.numberOfBlocksY, MyGlobals.numberOfBlocksX];
+            bField = new int[MyGlobals.numberOfBlocksY, MyGlobals.numberOfBlocksX];
             trench = new List<Sprite>();
             obstacles = new List<Sprite>();
             bridgePlates = new List<BridgePlate>();
@@ -113,6 +132,7 @@ namespace Torn
             bridges = new List<Sprite>();
             bridgeOn = new List<Sprite>();
             bridgeOff = new List<Sprite>();
+            blockers = new List<Sprite>();
 
             indexesAbove = new List<Vector2>();
             indexesBellow = new List<Vector2>();
@@ -124,10 +144,14 @@ namespace Torn
             hiddenLeft = new List<Sprite>();
             hiddenRight = new List<Sprite>();
 
+            tempField = new List<Sprite>();
             finished = new int[3] { 0, 0, 0 };
-            
+
+            levels = new List<Text>();
 
             old = new KeyboardState();
+
+
 
         }
         protected override void Initialize()
@@ -140,9 +164,12 @@ namespace Torn
         {
             string line;
             int i = 0, j = 0, k = 0, lastJ = 0, lastI = 0, result = 0, rest = 0;
-
+            System.IO.StreamReader file;
             //Try catcher
-            System.IO.StreamReader file = new System.IO.StreamReader(@"Levels\level" + levelName + ".txt");
+            if(custLevelNbr == 0)
+                file = new System.IO.StreamReader(@"Levels\level" + levelName + ".txt");
+            else
+                file = new System.IO.StreamReader(@"Levels\Custom\" + custLevelNbr + ".txt");
             
 
             while ((line = file.ReadLine()) != null)
@@ -247,18 +274,20 @@ namespace Torn
             MyGlobals.zeroY = MyGlobals.blockSize * result;
             MyGlobals.realHeigh = MyGlobals.blockSize * lastI + MyGlobals.blockSize * result;
             file.Close();
-
-            using (TextWriter tw = new StreamWriter(@"Levels\levelTeste.txt"))
-            {
-                for (j = 0; j < MyGlobals.numberOfBlocksY; j++)
-                {
-                    for (i = 0; i < MyGlobals.numberOfBlocksX; i++)
-                    {
-                        tw.Write(field[j, i] + " ");
-                    }
-                    tw.WriteLine();
-                }
-            }
+            
+            //Just for test of the resulting field
+            //using (TextWriter tw = new StreamWriter(@"Levels\levelTeste2222.txt"))
+            //{
+            //    for (j = 0; j < MyGlobals.numberOfBlocksY; j++)
+            //    {
+            //        for (i = 0; i < MyGlobals.numberOfBlocksX; i++)
+            //        {
+            //            tw.Write(field[j, i] + " ");
+            //        }
+            //        tw.WriteLine();
+            //    }
+            //}
+            
         }
         protected override void LoadContent()
         {
@@ -268,7 +297,15 @@ namespace Torn
 
 
             emptyLoadScreen = new Sprite(this, @"Images\emptyLoad", new Vector2(MyGlobals.width / 2, MyGlobals.heigh / 2));
-            
+            emptyField = new Sprite(this, @"Images\emptyField", new Vector2(MyGlobals.width / 2, MyGlobals.heigh / 2));
+            builder = new UserControlledSprite(this, @"Images\elements", new Vector2(MyGlobals.realBlockSize, MyGlobals.realBlockSize), false, false);
+            builder.Rectangle = new Rectangle(0, 0, (int) MyGlobals.realBlockSize, (int) MyGlobals.realBlockSize);
+            builder.change = true;
+            builder.Walls = new List<Sprite>();
+            builder.Obstacles = new List<Sprite>();
+            builder.Trench = new List<Sprite>();
+            builder.Bridge = new List<Sprite>();
+            builder.Indexes = new List<Vector2>();
             readField(levelNumber.ToString());
             highlightedGrass = new Sprite(this, @"Images\highlightedGrass", new Vector2(0, 0));
             grasses = new List<Sprite>();
@@ -276,8 +313,15 @@ namespace Torn
             gameMenu = new Sprite(this, @"Images\menu", new Vector2(MyGlobals.width / 2, MyGlobals.heigh / 2));
             gameMenu1 = new Sprite(this, @"Images\menu1", new Vector2(MyGlobals.width / 2, MyGlobals.heigh / 2));
             arrow = new Sprite(this, @"Images\arrow", new Vector2(100, 210));
+            levelList = new Sprite(this, @"Images\levelList", new Vector2(MyGlobals.width / 2, MyGlobals.heigh / 2));
+            died = new Sprite(this, @"Images\died", new Vector2(MyGlobals.width / 2, MyGlobals.heigh / 2));
 
-            if (!started && !menu && !menu1) 
+            if (isDead && !started)
+            {
+                Components.Add(died);
+                Components.Add(arrow);
+            }
+            else if (!started && !menu && !menu1) 
             {
                 kick = Content.Load<SoundEffect>(@"Sounds\Kick");
                 nice = Content.Load<SoundEffect>(@"Sounds\Nice");
@@ -463,6 +507,18 @@ namespace Torn
                             initialPosition.Y = (i + 1) * MyGlobals.blockSize - MyGlobals.blockSize/2;
                             finalPosition = initialPosition;
                             aux = new Sprite(this, @"Images\final", initialPosition);
+
+                            initialPosition.X = (j + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
+                            initialPosition.Y = (i) * MyGlobals.blockSize + 28;
+                            finalArms = new Sprite(this, @"Images\finalArms", initialPosition);
+
+                            initialPosition.X = (j + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
+                            initialPosition.Y = (i) * MyGlobals.blockSize + 8;
+                            finalHead = new Sprite(this, @"Images\finalHead", initialPosition);
+
+                            initialPosition.X = (j + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
+                            initialPosition.Y = (i) * MyGlobals.blockSize + 47;
+                            finalLegs = new Sprite(this, @"Images\finalLegs", initialPosition);
                             Components.Add(aux);
                         }
                     }
@@ -500,11 +556,27 @@ namespace Torn
                 {
                     for (int j = 0; j < MyGlobals.numberOfBlocksX; j++)
                     {
+                        if(field[i, j] == MyGlobals.final)
+                        {
+                            initialPosition.X = (j + 1) * MyGlobals.blockSize - MyGlobals.blockSize/2;
+                            initialPosition.Y = (i + 1) * MyGlobals.blockSize - MyGlobals.blockSize/2;
+                            body[0].Final = initialPosition;
+                            body[1].Final = initialPosition;
+                            body[2].Final = initialPosition;
+                        }
+                    }
+                }
+
+                for (int i = 0; i < MyGlobals.numberOfBlocksY; i++)
+                {
+                    for (int j = 0; j < MyGlobals.numberOfBlocksX; j++)
+                    {
                         if (field[i, j] == MyGlobals.blocksVision)
                         {
                             initialPosition.X = (j + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
                             initialPosition.Y = (i + 1) * MyGlobals.blockSize - MyGlobals.blockSize / 2;
-                            aux = new Sprite(this, @"Images\BlockVision", initialPosition);
+                            aux = new Sprite(this, @"Images\blockers", initialPosition);
+                            blockers.Add(aux);
                             blockSight.Add(aux.Position);
                             //trench.Add(aux);
                             walls.Add(aux);
@@ -514,7 +586,7 @@ namespace Torn
                 }
 
                 //Initializes the blind sprinte with the same position of the head
-               blindness = new Sprite(this, @"Images\Blindness", new Vector2(body[0].Position.X, body[0].Position.Y));
+                blindness = new Sprite(this, @"Images\Blindness", new Vector2(body[0].Position.X, body[0].Position.Y));
 
                 body[0].Trench = trench;
                 body[1].Trench = trench;
@@ -524,17 +596,16 @@ namespace Torn
                 body[1].Walls = walls;
                 body[2].Walls = walls;
 
-                body[0].Walls.Add(body[1]);
-                body[0].Walls.Add(body[2]);
-
-                body[1].Walls.Add(body[0]);
-                body[1].Walls.Add(body[2]);
-
-                body[2].Walls.Add(body[0]);
-                body[2].Walls.Add(body[1]);
-
-
                 body[1].Obstacles = obstacles;
+
+                body[0].Body1 = body[1];
+                body[0].Body2 = body[2];
+
+                body[1].Body1 = body[0];
+                body[1].Body2 = body[2];
+
+                body[2].Body1 = body[0];
+                body[2].Body2 = body[1];
 
                 //Components.Add(blindness);
                 //TUTORIAL
@@ -545,11 +616,9 @@ namespace Torn
                     text = new Text(this, new Vector2(20f, 80f), @"Verdana", tutorial, Color.Black);
                     Components.Add(text);
                     enter = new Sprite(this, @"Images\enter", new Vector2(MyGlobals.width - MyGlobals.blockSize / 2 , 3 * MyGlobals.blockSize - MyGlobals.blockSize / 2));
+                    Components.Add(enter);
                 }
-                
-
             }
-
         }
         protected override void UnloadContent()
         {
@@ -562,9 +631,80 @@ namespace Torn
 
             keyboard = Keyboard.GetState();
 
-            if(keyboard.IsKeyDown(Keys.Space) && !started && !menu && !menu1)
+            if(keyboard.IsKeyDown(Keys.Space) && !started && !menu && !menu1 && !levelEditor)
             {
                 menu = true;
+                LoadContent();
+            }
+
+            if(!started && isDead)
+            {
+                if(!keyboard.IsKeyDown(Keys.Down) && old.IsKeyDown(Keys.Down) && arrow.Position.Y < 330)
+                {
+                    arrow.Position = new Vector2(arrow.Position.X, arrow.Position.Y + MyGlobals.blockSize * 2);
+                }
+                else if (!keyboard.IsKeyDown(Keys.Up) && old.IsKeyDown(Keys.Up) && arrow.Position.Y > 210)
+                {
+                    arrow.Position = new Vector2(arrow.Position.X, arrow.Position.Y - MyGlobals.blockSize * 2);
+                }
+
+                if (!keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter) && arrow.Position.Y == 210)
+                {
+                    isDead = false;
+                    started = true;
+
+                    finished[0] = 1;
+                    finished[1] = 1;
+                    finished[2] = 1;
+
+                    LoadContent();
+                }
+                else if (!keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter) && arrow.Position.Y == 330)
+                {
+                    this.Exit();
+                }
+
+                old = keyboard;
+
+            }
+
+            if(started)
+            {
+                if(!body[0].Walls.Contains(body[1]))
+                    body[0].Walls.Add(body[1]);
+                if (!body[0].Walls.Contains(body[2]))
+                    body[0].Walls.Add(body[2]);
+
+                if (!body[1].Walls.Contains(body[0]))
+                    body[1].Walls.Add(body[0]);
+                if (!body[1].Walls.Contains(body[2]))
+                    body[1].Walls.Add(body[2]);
+
+                if (!body[2].Walls.Contains(body[0]))
+                    body[2].Walls.Add(body[0]);
+                if (!body[2].Walls.Contains(body[1]))
+                    body[2].Walls.Add(body[1]);
+
+                body[0].Body1 = body[1];
+                body[0].Body2 = body[2];
+
+                body[1].Body1 = body[0];
+                body[1].Body2 = body[2];
+
+                body[2].Body1 = body[0];
+                body[2].Body2 = body[1];
+
+                for (int i = 0; i < blockers.Count; i++)
+                {
+                    Components.Remove(blockers[i]);
+                    Components.Add(blockers[i]);
+                }
+            }
+
+            if(started && die())
+            {
+                isDead = true;
+                started = false;
                 LoadContent();
             }
 
@@ -579,10 +719,192 @@ namespace Torn
                 }
                 old = keyboard;
             }
+            
+            if (levelEditor)
+            {
+                if(!keyboard.IsKeyDown(Keys.Space) && old.IsKeyDown(Keys.Space))
+                {
+                    builder.Rectangle = new Rectangle(builder.Rectangle.X + (int) MyGlobals.realBlockSize, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                    if (builder.Rectangle.X == 330)
+                        builder.Rectangle = new Rectangle(0, 0, (int)MyGlobals.realBlockSize, (int)MyGlobals.realBlockSize);
+                }
+                if (!keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter))
+                {
+                    if (bField[(int)((builder.Position.Y - MyGlobals.blockSize / 2) / MyGlobals.blockSize), (int)((builder.Position.X - MyGlobals.blockSize / 2) / MyGlobals.blockSize)] == 0)
+                    {
+                        bField[(int)((builder.Position.Y - MyGlobals.blockSize / 2) / MyGlobals.blockSize), (int)((builder.Position.X - MyGlobals.blockSize / 2) / MyGlobals.blockSize)] = builder.Rectangle.X / (int)MyGlobals.realBlockSize;
+                        aux = new Sprite(this, @"Images\elements", builder.Position);
+                        aux.Rectangle = builder.Rectangle;
+                        tempField.Add(aux);
+                        Components.Add(aux);
+                        Components.Remove(builder);
+                        Components.Add(builder);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < tempField.Count; i++)
+                        {
+                            if(tempField[i].Position == builder.Position)
+                            {
+                                Components.Remove(tempField[i]);
+                                tempField.RemoveAt(i);
+                            }
+                        }
+                        bField[(int)((builder.Position.Y - MyGlobals.blockSize / 2) / MyGlobals.blockSize), (int)((builder.Position.X - MyGlobals.blockSize / 2) / MyGlobals.blockSize)] = builder.Rectangle.X / (int)MyGlobals.realBlockSize;
+                        aux = new Sprite(this, @"Images\elements", builder.Position);
+                        aux.Rectangle = builder.Rectangle;
+                        tempField.Add(aux);
+                        Components.Add(aux);
+                        Components.Remove(builder);
+                        Components.Add(builder);
+                    }
+                    
+                }
+                if (!keyboard.IsKeyDown(Keys.Escape) && old.IsKeyDown(Keys.Escape))
+                {
+                    bool hasHead = false, hasArms = false, hasLegs = false, hasFinal = false;
+                    for (int i = 0; i < MyGlobals.numberOfBlocksY; i++)
+                    {
+                        for (int j = 0; j < MyGlobals.numberOfBlocksX; j++)
+                        {
+                            if (bField[i, j] == MyGlobals.head)
+                                hasHead = true;
+                            if (bField[i, j] == MyGlobals.arms)
+                                hasArms = true;
+                            if (bField[i, j] == MyGlobals.legs)
+                                hasLegs = true;
+                            if (bField[i, j] == MyGlobals.final)
+                                hasFinal = true;
+                        }
+                    }
+
+                    if (hasArms && hasHead && hasLegs && hasFinal)
+                    {
+                        Components.Remove(text);
+                        DirectoryInfo di = new DirectoryInfo(@"Levels\Custom");
+                        foreach (var fi in di.GetFiles())
+                        {
+                            lastLevel++;
+                        }
+                        lastLevel++;
+
+                        using (TextWriter tw = new StreamWriter(@"Levels\Custom\" + lastLevel.ToString() + ".txt"))
+                        {
+                            for (int j = 0; j < MyGlobals.numberOfBlocksY; j++)
+                            {
+                                for (int i = 0; i < MyGlobals.numberOfBlocksX; i++)
+                                {
+                                    if (i == MyGlobals.numberOfBlocksX - 1)
+                                        tw.Write(bField[j, i]);
+                                    else
+                                        tw.Write(bField[j, i] + " ");
+                                }
+                                tw.WriteLine();
+                            }
+                        }
+                        menu = true;
+                        levelEditor = false;
+                        Components.Remove(emptyField);
+                        Components.Remove(builder);
+                        for (int i = 0; i < tempField.Count; i++)
+                        {
+                            Components.Remove(tempField[i]);
+                        }
+                        tempField = new List<Sprite>();
+                    }
+                    else
+                    {
+                        Components.Remove(text);
+                        menu = true;
+                        levelEditor = false;
+                        Components.Remove(emptyField);
+                        Components.Remove(builder);
+                        for (int i = 0; i < tempField.Count; i++)
+                        {
+                            Components.Remove(tempField[i]);
+                        }
+                        tempField = new List<Sprite>();
+                    }
+                }
+                old = keyboard;
+            }
+
+            if(selectLevel)
+            {
+                if (!keyboard.IsKeyDown(Keys.D0) && old.IsKeyDown(Keys.D0))
+                {
+                    customLevelNbrAux += '0';
+                }
+                if (!keyboard.IsKeyDown(Keys.D1) && old.IsKeyDown(Keys.D1))
+                {
+                    customLevelNbrAux += '1';
+                }
+                if (!keyboard.IsKeyDown(Keys.D2) && old.IsKeyDown(Keys.D2))
+                {
+                    customLevelNbrAux += '2';
+                }
+                if (!keyboard.IsKeyDown(Keys.D3) && old.IsKeyDown(Keys.D3))
+                {
+                    customLevelNbrAux += '3';
+                }
+                if (!keyboard.IsKeyDown(Keys.D4) && old.IsKeyDown(Keys.D4))
+                {
+                    customLevelNbrAux += '4';
+                }
+                if (!keyboard.IsKeyDown(Keys.D5) && old.IsKeyDown(Keys.D5))
+                {
+                    customLevelNbrAux += '5';
+                }
+                if (!keyboard.IsKeyDown(Keys.D6) && old.IsKeyDown(Keys.D6))
+                {
+                    customLevelNbrAux += '6';
+                }
+                if (!keyboard.IsKeyDown(Keys.D7) && old.IsKeyDown(Keys.D7))
+                {
+                    customLevelNbrAux += '7';
+                }
+                if (!keyboard.IsKeyDown(Keys.D8) && old.IsKeyDown(Keys.D8))
+                {
+                    customLevelNbrAux += '8';
+                }
+                if (!keyboard.IsKeyDown(Keys.D9) && old.IsKeyDown(Keys.D9))
+                {
+                    customLevelNbrAux += '9';
+                }
+                if (!keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter) && !customLevelNbrAux.Equals("0"))
+                {
+                    if (Components.Contains(text))
+                        Components.Remove(text);
+                    selectLevel = false;
+                    started = true;
+                    custLevelNbr = int.Parse(customLevelNbrAux);
+                    Components.Remove(levelList);
+                    for (int i = 0; i < levels.Count; i++)
+                    {
+                        Components.Remove(levels[i]);
+                    }
+                    LoadContent();
+                }
+                if (!keyboard.IsKeyDown(Keys.Escape) && old.IsKeyDown(Keys.Escape))
+                {
+                    if (Components.Contains(text))
+                        Components.Remove(text);
+                    selectLevel = false;
+                    menu = true;
+                    Components.Remove(levelList);
+                    for (int i = 0; i < levels.Count; i++)
+                    {
+                        Components.Remove(levels[i]);
+                    }
+                    LoadContent();
+                }
+
+                old = keyboard;
+            }
 
             if(menu)
             {
-                if(!keyboard.IsKeyDown(Keys.Down) && old.IsKeyDown(Keys.Down) && arrow.Position.Y < 570)
+                if(!keyboard.IsKeyDown(Keys.Down) && old.IsKeyDown(Keys.Down) && arrow.Position.Y < 690)
                 {
                     arrow.Position = new Vector2(arrow.Position.X, arrow.Position.Y + MyGlobals.blockSize * 2);
                 }
@@ -617,12 +939,47 @@ namespace Torn
                         }
                     }
                 }
+                else if (arrow.Position.Y == 450 && !keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter) && !levelEditor)
+                {
+                    Components.Add(emptyField);
+                    Components.Add(builder);
+                    levelEditor = true;
+                    menu = false;
+                    text = new Text(this, new Vector2(MyGlobals.blockSize * 5, MyGlobals.blockSize), "Verdana", "This feature still in development.", Color.Black);
+                    Components.Add(text);
+                }
                 else if (arrow.Position.Y == 570 && !keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter))
+                {
+                    selectLevel = true;
+                    menu = false;
+                       
+                    Components.Add(levelList);
+                    text = new Text(this, new Vector2(MyGlobals.blockSize * 5, MyGlobals.blockSize), "Verdana", "This feature still in development.", Color.Black);
+                    if (!Components.Contains(text))
+                        Components.Add(text);
+                    keyboard = Keyboard.GetState();
+
+                    DirectoryInfo di = new DirectoryInfo(@"Levels\Custom");
+                    int counter = 0;
+                    foreach (var fi in di.GetFiles())
+                    {
+                        counter++;
+                        textAux = new Text(this, new Vector2(90, 210), @"Verdana", "", Color.Black);
+                        textAux.TextContent = fi.Name.Replace(".txt", "");
+                        textAux.Position = new Vector2(textAux.Position.X, counter * MyGlobals.blockSize + textAux.Position.Y);
+                        if (textAux.Position.Y > 720)
+                        {
+                            textAux.Position = new Vector2(textAux.Position.X + 60, 210);
+                        }
+                        levels.Add(textAux);
+                        Components.Add(textAux);
+                    }
+                }
+                else if (arrow.Position.Y == 690 && !keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter))
                 {
                     this.Exit();
                 }
                 
-
                 old = keyboard;
             }
 
@@ -714,7 +1071,7 @@ namespace Torn
                     switch (messageIndex)
                     {
                         case 1:
-                            text.TextContent = "Welcome to Torn. Currently, your body is separated into three pieces. You \ncan alternate between these parts pressing A to select Arms, H to select \nhead and L to select legs. You can also restart the level pressing R.";
+                            text.TextContent = "Welcome to Torn. Currently, your body is separated into three pieces. You \ncan alternate between these parts pressing A to select Arms, H to select \nhead and L to select legs.";
                             if(Components.IndexOf(enter) == -1)    
                                 Components.Add(enter);
                             break;
@@ -730,6 +1087,7 @@ namespace Torn
                                     grasses[i].Color = Color.LightSeaGreen;
                             }
                             messageIndex = 4;
+                            allowHead = true;
                             break;
                     }
 
@@ -749,6 +1107,8 @@ namespace Torn
                     switch (messageIndex)
                     {
                         case 4:
+                            allowHead = false;
+                            body[0].change = false;
                             text.TextContent = "Now you can see and control your arms. Arms are able to push and pull \nblocks. They can also throw body parts. To throw or pull using your arms, \npress the Left Shift and the direction arrow desired.";
                             if(Components.IndexOf(enter) == -1)
                                 Components.Add(enter);
@@ -761,6 +1121,7 @@ namespace Torn
                                 if (grasses[i].Position == new Vector2(7 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 7 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
                                     grasses[i].Color = Color.LightSeaGreen;
                             }
+                            allowArms = true;
                             break;
                     }
 
@@ -777,10 +1138,16 @@ namespace Torn
                             grasses[i].Color = Color.White;
                     }
                     text.TextContent = "Now place the head on the pressure plate in order to restore the bridge \non the top of the level. Doing that you will be able to jump your legs \nover the trenches";
+                    allowArms = false;
                 }
                 else if (body[0].Position == new Vector2(11 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 6 * MyGlobals.blockSize + MyGlobals.blockSize / 2) && body[2].Position == new Vector2(4 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 4 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
                 {
                     text.TextContent = "Excellent! Now press L to select the legs and then jump over the trenches \npressing Left shift and the direction arrows.";
+                    body[1].change = false;
+                    body[0].change = false;
+                    allowArms = false;
+                    allowHead = false;
+                    allowLegs = true;
                 }
 
 
@@ -796,6 +1163,7 @@ namespace Torn
                         if (grasses[i].Position == new Vector2(8 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 7 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
                             grasses[i].Color = Color.LightSeaGreen;
                     }
+                    allowHead = true;
                     text.TextContent = "Now move the head to the highlighted area and then use the arm to throw it \nover the broken bridge.";
                 }
 
@@ -804,25 +1172,31 @@ namespace Torn
                     text.TextContent = "Now, place the legs on the other pressure plate at the botton of the level. \nDoing this, will enable you to join all of your body parts \nat the final portal.";
                 }
 
+                if (body[2].Position == new Vector2(10 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 9 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
+                {
+                    allowArms = true;
+                    allowLegs = true;
+                    allowHead = true;
+                }
+
             }
 
-            
             //Checks which part will move according with the user input, if the game is already started and if there is any other body part moving
-            if (keyboard.IsKeyDown(Keys.H) && started && !isBodyMoving() && !menu1)
+            if (keyboard.IsKeyDown(Keys.H) && started && !isBodyMoving() && !menu1 && allowHead)
             {
                 //If the head was selected, set the bool attribute 'change' in body[0] as true and in the other parts as false, in this way, only the head will move 
                 body[0].change = true;
                 body[1].change = false;
                 body[2].change = false;
             }
-            else if (keyboard.IsKeyDown(Keys.A) && started && !isBodyMoving() && !menu1)
+            else if (keyboard.IsKeyDown(Keys.A) && started && !isBodyMoving() && !menu1 && allowArms)
             {
                 //If the arms was selected, set the bool attribute 'change' in body[1] as true and in the other parts as false, in this way, only the arms will move
                 body[0].change = false;
                 body[1].change = true;
                 body[2].change = false;    
             }
-            else if (keyboard.IsKeyDown(Keys.L) && started && !isBodyMoving() && !menu1)
+            else if (keyboard.IsKeyDown(Keys.L) && started && !isBodyMoving() && !menu1 && allowLegs)
             {
                 //If the legs was selected, set the bool attribute 'change' in body[2] as true and in the other parts as false, in this way, only the legs will move
                 body[0].change = false;
@@ -973,10 +1347,13 @@ namespace Torn
             if (started && !menu1)
             {
                 int count;
-                indexesBellow = body[0].hidden(blockSight, 'd');
-                indexesRight = body[0].hidden(blockSight, 'r');
-                indexesLeft = body[0].hidden(blockSight, 'l');
-                indexesAbove = body[0].hidden(blockSight, 'u');
+                if (!keyboard.IsKeyDown(Keys.Up) && !keyboard.IsKeyDown(Keys.Down) && !keyboard.IsKeyDown(Keys.Right) && !keyboard.IsKeyDown(Keys.Left))
+                {
+                    indexesBellow = body[0].hidden(blockSight, 'd');
+                    indexesRight = body[0].hidden(blockSight, 'r');
+                    indexesLeft = body[0].hidden(blockSight, 'l');
+                    indexesAbove = body[0].hidden(blockSight, 'u');
+                }
 
                 //Bellow
                 if (indexesBellow.Count > 0)
@@ -1007,7 +1384,7 @@ namespace Torn
                         }
                     }
                 }
-                if (indexesBellow.Count < countBellow && hiddenBellow.Count > 0)
+                if (indexesBellow.Count < countBellow && hiddenBellow.Count > 0 && !keyboard.IsKeyDown(Keys.Up) && !keyboard.IsKeyDown(Keys.Down) && !keyboard.IsKeyDown(Keys.Right) && !keyboard.IsKeyDown(Keys.Left))
                 {
                     count = hiddenBellow.Count;
                     for (int i = 0; i < count; i++)
@@ -1049,7 +1426,7 @@ namespace Torn
                         }
                     }
                 }
-                if (indexesAbove.Count < countAbove && hiddenAbove.Count > 0)
+                if (indexesAbove.Count < countAbove && hiddenAbove.Count > 0 && !keyboard.IsKeyDown(Keys.Up) && !keyboard.IsKeyDown(Keys.Down) && !keyboard.IsKeyDown(Keys.Right) && !keyboard.IsKeyDown(Keys.Left))
                 {
                     count = hiddenAbove.Count;
                     for (int i = 0; i < count; i++)
@@ -1090,7 +1467,7 @@ namespace Torn
                         }
                     }
                 }
-                if (indexesLeft.Count < countLeft && hiddenLeft.Count > 0)
+                if (indexesLeft.Count < countLeft && hiddenLeft.Count > 0 && !keyboard.IsKeyDown(Keys.Up) && !keyboard.IsKeyDown(Keys.Down) && !keyboard.IsKeyDown(Keys.Right) && !keyboard.IsKeyDown(Keys.Left))
                 {
                     count = hiddenLeft.Count;
                     for (int i = 0; i < count; i++)
@@ -1131,7 +1508,7 @@ namespace Torn
                         }
                     }
                 }
-                if (indexesRight.Count < countRight && hiddenRight.Count > 0)
+                if (indexesRight.Count < countRight && hiddenRight.Count > 0 && !keyboard.IsKeyDown(Keys.Up) && !keyboard.IsKeyDown(Keys.Down) && !keyboard.IsKeyDown(Keys.Right) && !keyboard.IsKeyDown(Keys.Left))
                 {
                     count = hiddenRight.Count;
                     for (int i = 0; i < count; i++)
@@ -1156,6 +1533,8 @@ namespace Torn
                     body[1].Walls.Remove(body[0]);
                     body[2].Walls.Remove(body[0]);
                     finished[0] = 1;
+                    if (!Components.Contains(finalHead))
+                        Components.Add(finalHead);
                 }
                 if (finalized(body[1].Position))
                 {
@@ -1163,6 +1542,8 @@ namespace Torn
                     body[0].Walls.Remove(body[1]);
                     body[2].Walls.Remove(body[1]);
                     finished[1] = 1;
+                    if (!Components.Contains(finalArms))        
+                        Components.Add(finalArms);
                 }
                 if (finalized(body[2].Position))
                 {
@@ -1170,12 +1551,15 @@ namespace Torn
                     body[0].Walls.Remove(body[2]);
                     body[1].Walls.Remove(body[2]);
                     finished[2] = 1;
+                    if(!Components.Contains(finalLegs))
+                        Components.Add(finalLegs);
                 }
 
                 
 
                 if(levelFinished())
                 {
+                    blockers = new List<Sprite>();
                     body[0].Obstacles = new List<Sprite>();
                     body[0].Trench = new List<Sprite>();
                     body[0].Walls = new List<Sprite>();
@@ -1205,17 +1589,22 @@ namespace Torn
                             }
                         }
                     }
+
                     for (int i = 0; i < auxList.Count; i++)
                     {
                         for (int j = 0; j < walls.Count; j++)
                         {
                             if (walls[j].Position == auxList[i])
                             {
-                                bridgeOn.Add(walls[j]);
-                                walls.RemoveAt(j);
+                                if (walls[j] != body[0] && walls[j] != body[1] && walls[j] != body[2])
+                                {
+                                    bridgeOn.Add(walls[j]);
+                                    walls.RemoveAt(j);
+                                }
                             }
                         }
                     }
+
                 }
                 else
                 {
@@ -1253,7 +1642,6 @@ namespace Torn
             base.Draw(gameTime);
             
         }
-        //Verifies if any part of the body is moving
         public bool isBodyMoving()
         {
             for (int i = 0; i < 3; i++)
@@ -1291,6 +1679,30 @@ namespace Torn
             }
 
             return temp;
+        }
+        public bool die()
+        {
+            List<Vector2> temp = platePressed();
+
+            for (int i = 0; i < plates.Count; i++)
+            {
+                for (int j = 0; j < plates[i].EquivBridges.Count; j++)
+                {
+                    if (body[0].Position == plates[i].EquivBridges[j] && !temp.Contains(plates[i].EquivBridges[j]))
+                    {
+                        return true;
+                    }
+                    if (body[1].Position == plates[i].EquivBridges[j] && !temp.Contains(plates[i].EquivBridges[j]))
+                    {
+                        return true;
+                    }
+                    if (body[2].Position == plates[i].EquivBridges[j] && !temp.Contains(plates[i].EquivBridges[j]))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

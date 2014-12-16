@@ -35,6 +35,12 @@ namespace Torn
             set { text = value; }
         }
 
+        public Vector2 Position
+        {
+            get { return position; }
+            set { position = value; }
+        }
+
         protected override void LoadContent()
         {
             font = Game.Content.Load<SpriteFont>(fontFile);
