@@ -25,6 +25,11 @@ namespace Torn
         protected float layerDepth;
         protected List<Vector2> equivalentBridges; 
 
+        public Vector2 Center2
+        {
+            get { return center2; }
+            set { center2 = value; }
+        }
         public List<Vector2>EquivBridges
         {
             get { return equivalentBridges; }

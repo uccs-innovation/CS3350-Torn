@@ -36,3 +36,9 @@ Content\Images\blockers.xnb
 Content\Images\FinalArms.xnb
 Content\Images\FinalHead.xnb
 Content\Images\FinalLegs.xnb
+Content\Images\level_complete.xnb
+Content\Images\opening.xnb
+Content\Sounds\Falling.xnb
+Content\Sounds\GameOver.xnb
+Content\Sounds\SplittingApart.xnb
+Content\Sounds\TryAgain.xnb

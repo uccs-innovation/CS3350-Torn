@@ -335,6 +335,60 @@
       <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\FinalLegs.xnb</Output>
       <Time>2014-12-15T23:48:10.1224679-07:00</Time>
     </Item>
+    <Item>
+      <Source>Images\level_complete.png</Source>
+      <Name>Images\level_complete</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\level_complete.xnb</Output>
+      <Time>2014-12-17T14:02:47.8242933-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Images\opening.png</Source>
+      <Name>Images\opening</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\opening.xnb</Output>
+      <Time>2014-12-17T14:30:45.3921539-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Sounds\Falling.wav</Source>
+      <Name>Sounds\Falling</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Sounds\Falling.xnb</Output>
+      <Time>2014-12-17T15:17:46.9863618-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Sounds\GameOver.wav</Source>
+      <Name>Sounds\GameOver</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Sounds\GameOver.xnb</Output>
+      <Time>2014-12-17T15:18:03.5592791-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Sounds\SplittingApart.wav</Source>
+      <Name>Sounds\SplittingApart</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Sounds\SplittingApart.xnb</Output>
+      <Time>2014-12-17T15:18:37.1910123-07:00</Time>
+    </Item>
+    <Item>
+      <Source>Sounds\TryAgain.wav</Source>
+      <Name>Sounds\TryAgain</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Sounds\TryAgain.xnb</Output>
+      <Time>2014-12-17T15:18:42.5730572-07:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <ContentProjectGUID>{6C92A2E7-9426-4F63-BDC3-9BDF5E26F357}</ContentProjectGUID>

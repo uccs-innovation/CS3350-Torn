@@ -19,7 +19,7 @@ namespace Torn
         public SpriteBatch spriteBatch;
         Sprite initialScreen;
         Vector2 initialPosition, finalPosition;
-        bool started, menu, menu1, emptyLoad, levelEditor, selectLevel, isDead, allowHead, allowArms, allowLegs;
+        bool started, menu, menu1, emptyLoad, levelEditor, selectLevel, isDead, allowHead, allowArms, allowLegs, openingAnimation, levelEndAnimation;
         KeyboardState keyboard;
         UserControlledSprite[] body;
         UserControlledSprite builder;
@@ -39,7 +39,9 @@ namespace Torn
         List<Sprite> bridges;
         List<Sprite> tempField;
         List<Sprite> blockers;
-        Sprite finalArms, finalHead, finalLegs, finalBody;
+        Sprite opening;
+        Sprite levelComplete;
+        Sprite finalArms, finalHead, finalLegs;
         int lastLevel, custLevelNbr;
 
         int[] finished;
@@ -47,7 +49,7 @@ namespace Torn
         List<Vector2> indexesBellow, indexesRight, indexesLeft, indexesAbove;
         List<Sprite> hiddenAbove, hiddenBellow, hiddenRight, hiddenLeft;
         Song ambientSound;
-        SoundEffect kick, nice, pressurePlateOn, thrownHead, didIt;
+        SoundEffect kick, nice, pressurePlateOn, thrownHead, didIt, falling, gameOver, splitting, tryAgain;
         Text text, textAux;
         List<Text> levels;
         String tutorial;
@@ -101,7 +103,7 @@ namespace Torn
             graphics.PreferredBackBufferWidth = MyGlobals.width;
             graphics.PreferredBackBufferHeight = MyGlobals.heigh;
 
-            messageIndex = 1;
+            messageIndex = 0;
             levelNumber = 1;
             levelAux = levelNumber;
             bridgesNumber = 0;
@@ -117,6 +119,8 @@ namespace Torn
             allowArms = false;
             allowHead = false;
             allowLegs = false;
+            openingAnimation = false;
+            levelEndAnimation = false;
             isDead = false;
             field = new int[MyGlobals.numberOfBlocksY, MyGlobals.numberOfBlocksX];
             bField = new int[MyGlobals.numberOfBlocksY, MyGlobals.numberOfBlocksX];
@@ -150,8 +154,6 @@ namespace Torn
             levels = new List<Text>();
 
             old = new KeyboardState();
-
-
 
         }
         protected override void Initialize()
@@ -316,6 +318,14 @@ namespace Torn
             levelList = new Sprite(this, @"Images\levelList", new Vector2(MyGlobals.width / 2, MyGlobals.heigh / 2));
             died = new Sprite(this, @"Images\died", new Vector2(MyGlobals.width / 2, MyGlobals.heigh / 2));
 
+
+            opening = new Sprite(this, @"Images\opening", new Vector2(MyGlobals.width / 2, MyGlobals.heigh / 2));
+            opening.Rectangle = new Rectangle(0, 0, 480, 420);
+            opening.Center2 = new Vector2(MyGlobals.width / 4, MyGlobals.heigh / 4);
+            levelComplete = new Sprite(this, @"Images\level_complete", new Vector2(MyGlobals.width / 2, MyGlobals.heigh / 2));
+            levelComplete.Rectangle = new Rectangle(0, 0, 480, 420);
+            levelComplete.Center2 = new Vector2(MyGlobals.width / 4, MyGlobals.heigh / 4);
+
             if (isDead && !started)
             {
                 Components.Add(died);
@@ -328,6 +338,10 @@ namespace Torn
                 pressurePlateOn = Content.Load<SoundEffect>(@"Sounds\PressurePlateOn");
                 thrownHead = Content.Load<SoundEffect>(@"Sounds\ThrownHead");
                 didIt = Content.Load<SoundEffect>(@"Sounds\didIt");
+                falling = Content.Load<SoundEffect>(@"Sounds\Falling");
+                gameOver = Content.Load<SoundEffect>(@"Sounds\GameOver");
+                splitting = Content.Load<SoundEffect>(@"Sounds\SplittingApart");
+                tryAgain = Content.Load<SoundEffect>(@"Sounds\TryAgain");
 
                 initialPosition.X = graphics.PreferredBackBufferWidth / 2;
                 initialPosition.Y = graphics.PreferredBackBufferHeight / 2;
@@ -705,6 +719,7 @@ namespace Torn
             {
                 isDead = true;
                 started = false;
+                gameOver.Play();
                 LoadContent();
             }
 
@@ -902,6 +917,28 @@ namespace Torn
                 old = keyboard;
             }
 
+            if(menu && openingAnimation)
+            {
+                if (!Components.Contains(opening))
+                    Components.Add(opening);
+                
+                if (!keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter) && opening.Rectangle.X < 1440)
+                {
+                    if (opening.Rectangle.X == 960)
+                        splitting.Play();
+                    opening.Rectangle = new Rectangle(opening.Rectangle.X + 480, 0, 480, 420);
+
+                }
+                else if (!keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter) && opening.Rectangle.X >= 1440)
+                {
+                    menu = false;
+                    started = true;
+                    openingAnimation = false;
+                    LoadContent();
+                }
+                
+            }
+
             if(menu)
             {
                 if(!keyboard.IsKeyDown(Keys.Down) && old.IsKeyDown(Keys.Down) && arrow.Position.Y < 690)
@@ -915,9 +952,7 @@ namespace Torn
 
                 if (arrow.Position.Y == 210 && !keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter))
                 {
-                    menu = false;
-                    started = true;
-                    LoadContent();
+                    openingAnimation = true;
                 }
                 else if (arrow.Position.Y == 330 && !keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter))
                 {
@@ -1005,7 +1040,13 @@ namespace Torn
                 {
                     menu1 = false;
                     started = true;
-
+                    if (levelNumber == 1)
+                    {
+                        messageIndex = 1;
+                        allowArms = false;
+                        allowHead = false;
+                        allowLegs = false;
+                    }
                     finished[0] = 1;
                     finished[1] = 1;
                     finished[2] = 1;
@@ -1076,7 +1117,7 @@ namespace Torn
                                 Components.Add(enter);
                             break;
                         case 2:
-                            text.TextContent = "As you can see, some areas of the maze are invisible and you will have to \nmove the head in order to see them.";
+                            text.TextContent = "As you can see, some areas of the maze are invisible and you will have to \nmove the head in order to see them and solve the puzzle. To do that, you \nmust join all of your body parts at the end of the level.";
                             break;
                         case 3:
                             text.TextContent = "Press H to select the head and then use the arrow keys to move it to the \nhighlighted area.";
@@ -1109,7 +1150,7 @@ namespace Torn
                         case 4:
                             allowHead = false;
                             body[0].change = false;
-                            text.TextContent = "Now you can see and control your arms. Arms are able to push and pull \nblocks. They can also throw body parts. To throw or pull using your arms, \npress the Left Shift and the direction arrow desired.";
+                            text.TextContent = "Now you can see and control your arms. Arms are able to push and pull \nblocks. They can also throw body parts by pressing Left Shift and the arrow keys.";
                             if(Components.IndexOf(enter) == -1)
                                 Components.Add(enter);
                             break;
@@ -1164,7 +1205,7 @@ namespace Torn
                             grasses[i].Color = Color.LightSeaGreen;
                     }
                     allowHead = true;
-                    text.TextContent = "Now move the head to the highlighted area and then use the arm to throw it \nover the broken bridge.";
+                    text.TextContent = "Now move the head to the highlighted area and then use the arm to throw it\nover the broken bridge. To throw or pull something, you have \nto press the left shift key.";
                 }
 
                 if (body[2].Position == new Vector2(8 * MyGlobals.blockSize + MyGlobals.blockSize / 2, 4 * MyGlobals.blockSize + MyGlobals.blockSize / 2))
@@ -1555,24 +1596,75 @@ namespace Torn
                         Components.Add(finalLegs);
                 }
 
-                
+                if(levelEndAnimation)
+                {
+                    
+                    for (int i = 0; i < blockers.Count; i++)
+                    {
+                        Components.Remove(blockers[i]);
+                    }
+                    blockers = new List<Sprite>();
+                    if (!Components.Contains(levelComplete))
+                    {
+                        Components.Add(levelComplete);
+                        didIt.Play();
+                    }
+                    if(levelNumber == 4)
+                    {
+                        if (!keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter))
+                        {
+                            Components.Remove(levelComplete);
+                            levelEndAnimation = false;
+                            blockers = new List<Sprite>();
+                            body[0].Obstacles = new List<Sprite>();
+                            body[0].Trench = new List<Sprite>();
+                            body[0].Walls = new List<Sprite>();
+                            body[0].Bridge = new List<Sprite>();
+                            body[0].Indexes = new List<Vector2>();
+                            levelNumber++;
+                            if (levelNumber > 5)
+                            {
+                                this.Exit();
+                            }
+
+
+                            LoadContent();
+                        }
+                        
+                    }
+                    if(!keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter) && levelComplete.Rectangle.X < 1440 && levelNumber < 4)
+                    {
+                        if (levelComplete.Rectangle.X == 0)
+                            splitting.Play();
+                       
+                        levelComplete.Rectangle = new Rectangle(levelComplete.Rectangle.X + 480, 0, 480, 420);
+                    }
+                    else if (!keyboard.IsKeyDown(Keys.Enter) && old.IsKeyDown(Keys.Enter) && levelComplete.Rectangle.X >= 1440)
+                    {
+                        Components.Remove(levelComplete);
+                        levelEndAnimation = false;
+                        blockers = new List<Sprite>();
+                        body[0].Obstacles = new List<Sprite>();
+                        body[0].Trench = new List<Sprite>();
+                        body[0].Walls = new List<Sprite>();
+                        body[0].Bridge = new List<Sprite>();
+                        body[0].Indexes = new List<Vector2>();
+                        levelNumber++;
+                        if (levelNumber > 5)
+                        {
+                            this.Exit();
+                        }
+                        
+
+                        LoadContent();
+                    }
+
+                    old = keyboard;
+                }
 
                 if(levelFinished())
                 {
-                    blockers = new List<Sprite>();
-                    body[0].Obstacles = new List<Sprite>();
-                    body[0].Trench = new List<Sprite>();
-                    body[0].Walls = new List<Sprite>();
-                    body[0].Bridge = new List<Sprite>();
-                    body[0].Indexes = new List<Vector2>();
-                    levelNumber++;
-                    if (levelNumber > 5)
-                    {
-                        this.Exit();
-                    }
-                    didIt.Play();
-                    
-                    LoadContent();                    
+                    levelEndAnimation = true;
                 }
 
                 List<Vector2> auxList = platePressed();

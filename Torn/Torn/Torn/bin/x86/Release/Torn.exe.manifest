@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="Torn.exe" version="1.0.0.8" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
+  <asmv1:assemblyIdentity name="Torn.exe" version="1.0.0.9" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
   <description asmv2:iconFile="Game.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
@@ -68,14 +68,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Torn.exe" size="65024">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Torn.exe" size="67072">
       <assemblyIdentity name="Torn" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>bV1R6VcT6b3DnNUMpzALHnQygzc=</dsig:DigestValue>
+        <dsig:DigestValue>tkP1Rt+SjA488g4cLkkGMfxqWI0=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -295,6 +295,15 @@
       <dsig:DigestValue>iV8cPIx3yhJ2ECK3zaFEaeMWVy0=</dsig:DigestValue>
     </hash>
   </file>
+  <file name="Content\Images\level_complete.xnb" size="388922">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>xU0HXAAmFM7mpJ4KviitlWD11oE=</dsig:DigestValue>
+    </hash>
+  </file>
   <file name="Content\Images\levelList.xnb" size="11988">
     <hash>
       <dsig:Transforms>
@@ -320,6 +329,15 @@
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
       <dsig:DigestValue>huGsIK3KOyYaMNvndsTPY9INYvc=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Content\Images\opening.xnb" size="468914">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>Wp3KdksJTvzBwJ0onrq3IG1TFUs=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\Images\pit.xnb" size="2180">
@@ -367,6 +385,24 @@
       <dsig:DigestValue>skems5t1ejLkf3zd0Ez6mkraQPY=</dsig:DigestValue>
     </hash>
   </file>
+  <file name="Content\Sounds\Falling.xnb" size="211049">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>e4jeOwYuWhFbEtnJ4TsxgX84j6o=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Content\Sounds\GameOver.xnb" size="352361">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>sj4mULz6N1Xgl7/Ip40KKhLEWqo=</dsig:DigestValue>
+    </hash>
+  </file>
   <file name="Content\Sounds\Kick.xnb" size="88169">
     <hash>
       <dsig:Transforms>
@@ -403,6 +439,15 @@
       <dsig:DigestValue>BgLVMx85DnGO33uPSDkeNLTOdlQ=</dsig:DigestValue>
     </hash>
   </file>
+  <file name="Content\Sounds\SplittingApart.xnb" size="430185">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>hL2A9/ipYxhNS9IawwtcNC5kwtM=</dsig:DigestValue>
+    </hash>
+  </file>
   <file name="Content\Sounds\ThrownHead.xnb" size="153705">
     <hash>
       <dsig:Transforms>
@@ -410,6 +455,15 @@
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
       <dsig:DigestValue>wXshrJN+RkfBetzo8Mvi/E9kD+Q=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Content\Sounds\TryAgain.xnb" size="327785">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>bWbzjUoAkVHUUewK4rNCkBT6k6I=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\Verdana.xnb" size="5876">

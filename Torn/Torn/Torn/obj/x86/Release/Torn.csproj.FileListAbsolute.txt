@@ -46,3 +46,9 @@ C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Im
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\FinalArms.xnb
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\FinalHead.xnb
 C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\FinalLegs.xnb
+C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\level_complete.xnb
+C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Images\opening.xnb
+C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Sounds\Falling.xnb
+C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Sounds\GameOver.xnb
+C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Sounds\SplittingApart.xnb
+C:\Users\Cristiano\Desktop\CS3350-Torn\Torn\Torn\Torn\bin\x86\Release\Content\Sounds\TryAgain.xnb
